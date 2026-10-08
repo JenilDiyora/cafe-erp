@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome | {{ cafe_settings.cafe_name if cafe_settings else 'Mitra Cafe' }}{% endblock %}
+
+{% block content %}
+<!-- 1. Hero Section -->
+<section class="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="hero-badge">
+          <i class="bi bi-stars"></i> Specialty Coffee & Artisanal Bakery
+        </span>
+        <h1 class="hero-title">
+          {{ cafe_settings.tagline if cafe_settings else 'Crafted Coffee & Cozy Moments' }}
+        </h1>
+        <p class="hero-subtitle">
+          {{ cafe_settings.short_description if cafe_settings else 'Step into a world of rich single-origin aromas, handcrafted sourdough creations, and comfortable spaces built to inspire.' }}
+        </p>
+        <div class="d-flex flex-wrap gap-3 hero-btn-group">
+          <a href="{{ url('menu:list') }}" class="btn btn-cafe-secondary btn-lg">
+            <i class="bi bi-book-half"></i> Explore Our Menu
+          </a>
+          <a href="{{ url('contact:index') }}" class="btn btn-outline-light btn-lg rounded-pill">
+            <i class="bi bi-geo-alt-fill"></i> Find Our Location
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="hero-feature-card text-center">
+              <i class="bi bi-fire fs-2 text-warning mb-2 d-block"></i>
+              <h5 class="h6 mb-1 text-white">Freshly Roasted</h5>
+              <small class="text-white-50">100% Arabica Beans</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="hero-feature-card text-center">
+              <i class="bi bi-egg-fried fs-2 text-warning mb-2 d-block"></i>
+              <h5 class="h6 mb-1 text-white">Artisan Bakery</h5>
+              <small class="text-white-50">Baked Fresh Daily</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="hero-feature-card text-center">
+              <i class="bi bi-wifi fs-2 text-warning mb-2 d-block"></i>
+              <h5 class="h6 mb-1 text-white">High-Speed Wi-Fi</h5>
+              <small class="text-white-50">Work & Study Friendly</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="hero-feature-card text-center">
+              <i class="bi bi-heart-pulse-fill fs-2 text-warning mb-2 d-block"></i>
+              <h5 class="h6 mb-1 text-white">Ethical Sourcing</h5>
+              <small class="text-white-50">Direct Trade Farms</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Featured Menu Items -->
+<section class="section-padding bg-white">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-tag">Chef's Highlights</span>
+      <h2 class="section-title">Featured Delights</h2>
+      <p class="section-desc">Handpicked favorites that keep our regulars coming back every day.</p>
+    </div>
+
+    <div class="row g-4">
+      {% for product in featured_products %}
+        <div class="col-lg-4 col-md-6">
+          <div class="menu-card">
+            <div class="menu-card-img-wrap">
+              <div class="badge-badge-wrap">
+                {% if product.is_bestseller %}
+                  <span class="badge-bestseller"><i class="bi bi-star-fill"></i> Bestseller</span>
+                {% endif %}
+                {% if product.is_featured %}
+                  <span class="badge-featured"><i class="bi bi-award-fill"></i> Featured</span>
+                {% endif %}
+              </div>
+              {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="menu-card-img" loading="lazy">
+              {% else %}
+                <div class="menu-card-fallback-icon">
+                  <i class="bi bi-cup-hot"></i>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="menu-card-header">
+              <h3 class="menu-card-title">
+                {{ product.name }}
+                {% if product.vegetarian %}
+                  <span class="dietary-tag tag-veg" title="Vegetarian"></span>
+                {% endif %}
+                {% if product.spicy %}
+                  <span class="dietary-tag tag-spicy" title="Spicy"><i class="bi bi-fire"></i></span>
+                {% endif %}
+              </h3>
+              <span class="menu-card-price">{{ product.price|currency }}</span>
+            </div>
+
+            <p class="menu-card-desc">{{ product.short_description or product.description|truncate(90) }}</p>
+
+            <div class="menu-card-footer">
+              <span class="text-muted"><i class="bi bi-tag me-1"></i>{{ product.category.name }}</span>
+              {% if product.is_available %}
+                <span class="status-available"><i class="bi bi-check-circle me-1"></i>Available</span>
+              {% else %}
+                <span class="status-unavailable"><i class="bi bi-x-circle me-1"></i>Sold Out</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="{{ url('menu:list') }}" class="btn btn-cafe-primary btn-lg">
+        <i class="bi bi-journal-text"></i> View Full Menu
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 3. About Us Preview -->
+<section class="section-padding" style="background-color: var(--bg-warm);">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="position-relative pe-lg-4">
+          <div class="rounded-4 overflow-hidden shadow-sm bg-white border">
+            <div style="height: 220px; overflow: hidden;">
+              <img src="/media/gallery/espresso_bar.jpg" alt="Mitra Cafe Espresso Bar" class="w-100 h-100" style="object-fit: cover;">
+            </div>
+            <div class="p-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="brand-icon" style="width: 46px; height: 46px; font-size: 1.3rem;">
+                  <i class="bi bi-flower1"></i>
+                </div>
+                <div>
+                  <h4 class="mb-0">Our Coffee Craft</h4>
+                  <small class="text-muted">From Cherry to Cup</small>
+                </div>
+              </div>
+            <p class="text-muted mb-3">
+              {{ cafe_settings.about_description if cafe_settings else 'We believe every cup of coffee tells a story of the soil, elevation, and farmer who nurtured the beans.' }}
+            </p>
+            <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+              <div>
+                <strong class="d-block text-dark">Locally Sourced</strong>
+                <small class="text-muted">100% Traceable origins</small>
+              </div>
+              <div>
+                <strong class="d-block text-dark">Micro-Roasted</strong>
+                <small class="text-muted">Small batch perfection</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+        <span class="section-tag">Our Passion</span>
+        <h2 class="section-title">A Warm Haven for Coffee & Conversation</h2>
+        <p class="lead text-muted mb-4">
+          More than just a coffee shop, we are a neighborhood sanctuary designed for early mornings, slow afternoons, and inspired evening gatherings.
+        </p>
+        <p class="text-muted mb-4">
+          Whether you crave an intense double ristretto, a comforting cardamom chai, or a warm buttery croissant just pulled out of our oven, our space is made for you.
+        </p>
+        <a href="{{ url('core:about') }}" class="btn btn-cafe-outline">
+          <i class="bi bi-arrow-right-circle"></i> Discover Our Story
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Why Choose Us Highlights -->
+<section class="section-padding bg-white">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-tag">The Experience</span>
+      <h2 class="section-title">Why Guests Love Us</h2>
+      <p class="section-desc">We obsess over every detail so your coffee break is the best moment of your day.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="p-4 rounded-4 border bg-light h-100 text-center feature-card">
+          <div class="brand-icon mx-auto mb-3" style="width:56px; height:56px; font-size:1.5rem;">
+            <i class="bi bi-cup-hot"></i>
+          </div>
+          <h4 class="h5 mb-2">Artisan Roasting</h4>
+          <p class="text-muted small mb-0">We roast in small weekly batches to capture bright floral notes, deep caramel bodies, and smooth chocolate undertones.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4 rounded-4 border bg-light h-100 text-center feature-card">
+          <div class="brand-icon mx-auto mb-3" style="width:56px; height:56px; font-size:1.5rem;">
+            <i class="bi bi-basket"></i>
+          </div>
+          <h4 class="h5 mb-2">Organic Bakery</h4>
+          <p class="text-muted small mb-0">Our doughs undergo slow 24-hour fermentation for superior flavor, digestibility, and that irresistible crunch.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4 rounded-4 border bg-light h-100 text-center feature-card">
+          <div class="brand-icon mx-auto mb-3" style="width:56px; height:56px; font-size:1.5rem;">
+            <i class="bi bi-people"></i>
+          </div>
+          <h4 class="h5 mb-2">Cozy Community</h4>
+          <p class="text-muted small mb-0">Spacious tables, power outlets, quiet corners, and friendly baristas who remember your favorite brew.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Customer Reviews -->
+<section class="section-padding" style="background-color: var(--bg-warm);">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-tag">Testimonials</span>
+      <h2 class="section-title">What Our Guests Say</h2>
+      <p class="section-desc">Honest words from coffee enthusiasts and everyday visitors.</p>
+    </div>
+
+    <div class="row g-4">
+      {% for review in reviews %}
+        <div class="col-lg-4 col-md-6">
+          <div class="review-card">
+            <div class="star-rating">
+              {% for i in range(1, 6) %}
+                <i class="bi bi-star-fill {{ 'text-warning' if i <= review.rating else 'text-muted' }}"></i>
+              {% endfor %}
+            </div>
+            <p class="review-quote">"{{ review.review_text }}"</p>
+            <div class="review-author">
+              {% if review.customer_image %}
+                <img src="{{ review.customer_image.url }}" alt="{{ review.customer_name }}" class="rounded-circle shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
+              {% else %}
+                <div class="author-avatar">
+                  {{ review.customer_name[:1] }}
+                </div>
+              {% endif %}
+              <div class="author-info">
+                <h6>{{ review.customer_name }}</h6>
+                <span>Verified Visitor</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{{ url('reviews:list') }}" class="btn btn-cafe-outline">
+        <i class="bi bi-chat-quote"></i> Read All Reviews
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Gallery Preview -->
+<section class="section-padding bg-white">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-tag">Visual Tour</span>
+      <h2 class="section-title">Moments at the Cafe</h2>
+      <p class="section-desc">Glimpses into our daily coffee ritual, warm corners, and sweet treats.</p>
+    </div>
+
+    <div class="gallery-grid">
+      {% for item in gallery_images %}
+        <div class="gallery-card"
+             data-full-src="{{ item.image.url if item.image else '' }}"
+             data-title="{{ item.title }}"
+             data-caption="{{ item.caption }}">
+          {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" loading="lazy">
+          {% else %}
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-muted">
+              <i class="bi bi-camera fs-1"></i>
+            </div>
+          {% endif %}
+          <div class="gallery-overlay">
+            <h5>{{ item.title }}</h5>
+            <p>{{ item.caption or item.category.name }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="{{ url('gallery:list') }}" class="btn btn-cafe-secondary">
+        <i class="bi bi-images"></i> Explore Full Gallery
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Opening Hours & Location Section -->
+<section class="section-padding" style="background-color: var(--bg-warm);">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <!-- Opening Hours Box -->
+      <div class="col-lg-5">
+        <div class="bg-white p-4 p-md-5 rounded-4 border shadow-sm">
+          <span class="section-tag">Come Visit Us</span>
+          <h3 class="mb-4">Opening Hours</h3>
+          <ul class="list-unstyled mb-4">
+            {% for h in opening_hours %}
+              <li class="d-flex justify-content-between py-2 border-bottom">
+                <span class="fw-semibold text-dark">{{ h.day }}</span>
+                <span class="text-secondary fw-bold">
+                  {% if h.is_closed %}
+                    <span class="text-danger">Closed</span>
+                  {% else %}
+                    {{ h.opening_time }} - {{ h.closing_time }}
+                  {% endif %}
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+          <a href="{{ url('contact:index') }}" class="btn btn-cafe-primary w-100 justify-content-center">
+            <i class="bi bi-envelope-paper"></i> Get in Touch
+          </a>
+        </div>
+      </div>
+
+      <!-- Location Info & Map -->
+      <div class="col-lg-7">
+        <span class="section-tag">Find Us</span>
+        <h2 class="section-title">Conveniently Located</h2>
+        <p class="text-muted mb-4">
+          <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+          <a href="{{ cafe_settings.google_maps_url if cafe_settings and cafe_settings.google_maps_url else 'https://maps.app.goo.gl/YjiYuT8wt5XhwfJC7' }}" target="_blank" rel="noopener noreferrer" class="text-reset text-decoration-none">
+            {{ cafe_settings.address if cafe_settings else 'Mitra Cafe, Chhaprabhatha, Surat, Gujarat 394520' }}
+            <i class="bi bi-box-arrow-up-right ms-1 small text-secondary"></i>
+          </a>
+        </p>
+
+        <!-- Map Embed -->
+        <div class="rounded-4 overflow-hidden border shadow-sm map-embed-frame" style="height: 320px;">
+          <div class="cafe-interactive-map"
+               id="homeCafeMap"
+               data-lat="21.266236"
+               data-lng="72.823239"
+               data-zoom="15"
+               data-maps-url="{{ cafe_settings.google_maps_url if cafe_settings and cafe_settings.google_maps_url else 'https://maps.app.goo.gl/YjiYuT8wt5XhwfJC7' }}"
+               data-address="{{ cafe_settings.address if cafe_settings else 'Mitra Cafe, Chhaprabhatha, Surat, Gujarat 394520' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox Modal for Gallery Preview -->
+<div class="modal fade" id="galleryLightboxModal" tabindex="-1" aria-labelledby="lightboxTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+      <div class="modal-body p-0 position-relative bg-dark text-center">
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        <img id="lightboxImage" src="" alt="Gallery Image" class="img-fluid" style="max-height: 80vh; width: auto; object-fit: contain;">
+        <div class="p-3 bg-dark text-white text-start">
+          <h5 id="lightboxTitle" class="text-white mb-1"></h5>
+          <p id="lightboxCaption" class="small text-white-50 mb-0"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Guest Reviews | {{ cafe_settings.cafe_name if cafe_settings else 'Mitra Cafe' }}{% endblock %}
+
+{% block meta_description %}Read real reviews from visitors and coffee enthusiasts about Mitra Cafe's coffee, ambiance, and food.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: linear-gradient(135deg, #2a160c 0%, #3e2417 100%); color: #fff;">
+  <div class="container text-center py-4">
+    <span class="hero-badge"><i class="bi bi-star-fill text-warning"></i> Customer Praise</span>
+    <h1 class="display-5 fw-bold text-white mb-2">Guest Testimonials</h1>
+    <p class="lead text-white-50 mx-auto" style="max-width: 650px;">
+      Read genuine stories and feedback shared by members of our community.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Rating Overview Banner -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5 bg-white">
+    <div class="row align-items-center g-4">
+      <div class="col-md-4 text-center border-md-end">
+        <h2 class="display-3 fw-bold text-primary mb-0">{{ avg_rating }}</h2>
+        <div class="star-rating justify-content-center my-2">
+          {% for i in range(1, 6) %}
+            <i class="bi bi-star-fill {{ 'text-warning' if i <= avg_rating else 'text-muted' }} fs-4"></i>
+          {% endfor %}
+        </div>
+        <p class="text-muted small mb-0">Based on {{ total_reviews }} verified reviews</p>
+      </div>
+      <div class="col-md-8">
+        <h3 class="h4 mb-2">Committed to Remarkable Coffee Moments</h3>
+        <p class="text-muted mb-0">
+          Every testimonial inspires our baristas and kitchen crew to keep innovating, perfecting our extraction temperatures, and baking fresh sourdough with pure passion.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Reviews Highlight -->
+  {% if featured_reviews %}
+    <div class="mb-5">
+      <h3 class="h4 mb-4 text-primary"><i class="bi bi-award-fill text-warning me-2"></i>Featured Highlights</h3>
+      <div class="row g-4">
+        {% for review in featured_reviews %}
+          <div class="col-lg-4 col-md-6">
+            <div class="review-card border-primary border-opacity-25" style="background-color: #fffdfa;">
+              <div class="star-rating">
+                {% for i in range(1, 6) %}
+                  <i class="bi bi-star-fill {{ 'text-warning' if i <= review.rating else 'text-muted' }}"></i>
+                {% endfor %}
+              </div>
+              <p class="review-quote">"{{ review.review_text }}"</p>
+              <div class="review-author">
+                {% if review.customer_image %}
+                  <img src="{{ review.customer_image.url }}" alt="{{ review.customer_name }}" class="rounded-circle shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
+                {% else %}
+                  <div class="author-avatar">
+                    {{ review.customer_name[:1] }}
+                  </div>
+                {% endif %}
+                <div class="author-info">
+                  <h6>{{ review.customer_name }}</h6>
+                  <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> Featured</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- All Reviews Grid -->
+  <h3 class="h4 mb-4 text-primary">All Reviews</h3>
+  <div class="row g-4">
+    {% for review in reviews %}
+      <div class="col-lg-4 col-md-6">
+        <div class="review-card">
+          <div class="star-rating">
+            {% for i in range(1, 6) %}
+              <i class="bi bi-star-fill {{ 'text-warning' if i <= review.rating else 'text-muted' }}"></i>
+            {% endfor %}
+          </div>
+          <p class="review-quote">"{{ review.review_text }}"</p>
+          <div class="review-author">
+            {% if review.customer_image %}
+              <img src="{{ review.customer_image.url }}" alt="{{ review.customer_name }}" class="rounded-circle shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
+            {% else %}
+              <div class="author-avatar">
+                {{ review.customer_name[:1] }}
+              </div>
+            {% endif %}
+            <div class="author-info">
+              <h6>{{ review.customer_name }}</h6>
+              <span>{{ review.created_at.strftime('%B %d, %Y') if review.created_at else 'Verified Guest' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

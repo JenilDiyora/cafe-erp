@@ -1,0 +1,54 @@
+{% set cafe = get_cafe_settings() %}
+<header>
+  <nav class="navbar navbar-expand-lg cafe-navbar sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url('core:home') }}">
+        {% if cafe and cafe.logo %}
+          <img src="{{ cafe.logo.url }}" alt="{{ cafe.cafe_name }}" height="40" class="d-inline-block align-text-top">
+        {% else %}
+          <span class="brand-icon"><i class="bi bi-cup-hot-fill"></i></span>
+        {% endif %}
+        <span>{{ cafe.cafe_name if cafe else 'Mitra Cafe' }}</span>
+      </a>
+
+      <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-2 text-dark"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="{{ url('core:home') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if '/menu/' in request.path else '' }}" href="{{ url('menu:list') }}">Menu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if '/about/' in request.path else '' }}" href="{{ url('core:about') }}">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if '/gallery/' in request.path else '' }}" href="{{ url('gallery:list') }}">Gallery</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if '/reviews/' in request.path else '' }}" href="{{ url('reviews:list') }}">Reviews</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if '/contact/' in request.path else '' }}" href="{{ url('contact:index') }}">Contact</a>
+          </li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+          <button id="themeToggleBtn" type="button" class="btn btn-outline-secondary btn-sm rounded-circle d-inline-flex align-items-center justify-content-center theme-toggle-btn" style="width: 36px; height: 36px;" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <i class="bi bi-moon-stars-fill"></i>
+          </button>
+          <a href="{{ url('admin:index') }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" title="Django Admin Dashboard">
+            <i class="bi bi-shield-lock-fill me-1"></i> Admin
+          </a>
+          <a href="{{ url('contact:index') }}" class="btn btn-cafe-primary btn-sm px-3 py-2">
+            <i class="bi bi-telephone-fill"></i> Contact Us
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,83 @@
+/* ==========================================================================
+   Artisan Brew Cafe — Responsive Stylesheet
+   Phase 1 Breakpoint Adjustments
+   ========================================================================== */
+
+/* Extra Small (Mobile Phones < 576px) */
+@media (max-width: 575.98px) {
+  .hero-title {
+    font-size: 2.15rem;
+  }
+  .hero-subtitle {
+    font-size: 0.98rem;
+  }
+  .section-padding {
+    padding: 3.5rem 0;
+  }
+  .section-title {
+    font-size: 1.85rem;
+  }
+  .menu-card-img-wrap {
+    height: 180px;
+  }
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-card, .contact-info-card {
+    padding: 1.5rem;
+  }
+  .category-pills {
+    gap: 0.4rem;
+  }
+  .category-pill {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+  }
+  .hero-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .hero-btn-group .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Small Tablets (576px to 767px) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .section-padding {
+    padding: 4rem 0;
+  }
+}
+
+/* Tablets & Medium Screens (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .hero-title {
+    font-size: 2.8rem;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large Screens (Laptops & Desktops 992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+}
+
+/* Extra Large Screens (>= 1200px) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1180px;
+  }
+}
+

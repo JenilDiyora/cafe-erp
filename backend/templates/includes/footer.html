@@ -1,0 +1,102 @@
+{% set cafe = get_cafe_settings() %}
+{% set hours = get_opening_hours() %}
+<footer class="cafe-footer">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Col 1: About Cafe -->
+      <div class="col-lg-4 col-md-6">
+        <h5 class="d-flex align-items-center gap-2 mb-3">
+          <span class="brand-icon" style="width:32px; height:32px; font-size:0.9rem;">
+            <i class="bi bi-cup-hot-fill"></i>
+          </span>
+          {{ cafe.cafe_name if cafe else 'Mitra Cafe' }}
+        </h5>
+        <p class="small text-white-50 mb-3">
+          {{ cafe.short_description if cafe else 'Your local artisanal coffee haven offering hand-brewed specialty coffee, freshly baked artisanal pastries, and a warm, inviting atmosphere.' }}
+        </p>
+        <div class="d-flex align-items-center gap-2 mt-3">
+          {% if cafe and cafe.instagram_url %}
+            <a href="{{ cafe.instagram_url }}" target="_blank" rel="noopener" class="social-pill-btn social-pill-instagram" style="width:36px; height:36px; font-size:1.05rem;" aria-label="Instagram">
+              <i class="bi bi-instagram"></i>
+            </a>
+          {% endif %}
+          {% if cafe and cafe.facebook_url %}
+            <a href="{{ cafe.facebook_url }}" target="_blank" rel="noopener" class="social-pill-btn social-pill-facebook" style="width:36px; height:36px; font-size:1.05rem;" aria-label="Facebook">
+              <i class="bi bi-facebook"></i>
+            </a>
+          {% endif %}
+          {% if cafe and cafe.whatsapp_number %}
+            <a href="https://wa.me/{{ cafe.whatsapp_number|replace(' ', '')|replace('+', '') }}" target="_blank" rel="noopener" class="social-pill-btn social-pill-whatsapp" style="width:36px; height:36px; font-size:1.05rem;" aria-label="WhatsApp">
+              <i class="bi bi-whatsapp"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Col 2: Quick Links -->
+      <div class="col-lg-2 col-md-6 col-6">
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled mb-0">
+          <li><a href="{{ url('core:home') }}" class="footer-link">Home</a></li>
+          <li><a href="{{ url('menu:list') }}" class="footer-link">Browse Menu</a></li>
+          <li><a href="{{ url('core:about') }}" class="footer-link">About Us</a></li>
+          <li><a href="{{ url('gallery:list') }}" class="footer-link">Gallery</a></li>
+          <li><a href="{{ url('reviews:list') }}" class="footer-link">Reviews</a></li>
+          <li><a href="{{ url('contact:index') }}" class="footer-link">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Opening Hours -->
+      <div class="col-lg-3 col-md-6 col-6">
+        <h5>Opening Hours</h5>
+        <ul class="hours-list">
+          {% if hours %}
+            {% for h in hours %}
+              <li class="hours-item text-white-50">
+                <span class="hours-item-day text-white">{{ h.day }}</span>
+                <span class="hours-item-time">
+                  {% if h.is_closed %}Closed{% else %}{{ h.opening_time }} - {{ h.closing_time }}{% endif %}
+                </span>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li class="hours-item text-white-50">Mon - Fri: 8:00 AM - 10:00 PM</li>
+            <li class="hours-item text-white-50">Sat - Sun: 8:00 AM - 11:00 PM</li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- Col 4: Contact & Location -->
+      <div class="col-lg-3 col-md-6">
+        <h5>Contact Info</h5>
+        <ul class="list-unstyled text-white-50 small mb-0">
+          <li class="mb-2 d-flex align-items-start gap-2">
+            <i class="bi bi-geo-alt-fill text-warning mt-1"></i>
+            <a href="{{ cafe.google_maps_url if cafe and cafe.google_maps_url else 'https://maps.app.goo.gl/YjiYuT8wt5XhwfJC7' }}" target="_blank" rel="noopener noreferrer" class="text-white-50 text-decoration-none">
+              {{ cafe.address if cafe else 'Mitra Cafe, Chhaprabhatha, Surat, Gujarat 394520' }}
+            </a>
+          </li>
+          <li class="mb-2 d-flex align-items-center gap-2">
+            <i class="bi bi-telephone-fill text-warning"></i>
+            <a href="tel:{{ cafe.phone if cafe else '+917405401350' }}" class="text-white-50 text-decoration-none">
+              {{ cafe.phone if cafe else '+91 7405401350' }}
+            </a>
+          </li>
+          <li class="mb-2 d-flex align-items-center gap-2">
+            <i class="bi bi-envelope-fill text-warning"></i>
+            <a href="mailto:{{ cafe.email if cafe else 'jenildiyora760@gmail.com' }}" class="text-white-50 text-decoration-none">
+              {{ cafe.email if cafe else 'jenildiyora760@gmail.com' }}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom text-white-50">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+        <p class="mb-0">&copy; 2026 {{ cafe.cafe_name if cafe else 'Mitra Cafe' }}. All rights reserved.</p>
+        <p class="mb-0 small">Powered by Django + Jinja2 + PostgreSQL</p>
+      </div>
+    </div>
+  </div>
+</footer>

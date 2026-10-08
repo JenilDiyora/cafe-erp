@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Gallery | {{ cafe_settings.cafe_name if cafe_settings else 'Mitra Cafe' }}{% endblock %}
+
+{% block meta_description %}Explore photos of Mitra Cafe: espresso brewing rituals, latte art, freshly baked viennoiserie, cozy interior spaces, and outdoor terrace seating.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: linear-gradient(135deg, #2a160c 0%, #3e2417 100%); color: #fff;">
+  <div class="container text-center py-4">
+    <span class="hero-badge"><i class="bi bi-camera-fill"></i> Visual Atmosphere</span>
+    <h1 class="display-5 fw-bold text-white mb-2">Our Cafe Gallery</h1>
+    <p class="lead text-white-50 mx-auto" style="max-width: 650px;">
+      A glimpse into the artisan craft, cozy corners, and memorable gatherings at Mitra Cafe.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Category Filter Pills -->
+  <div class="category-pills">
+    <a href="{{ url('gallery:list') }}?category=all"
+       class="category-pill {{ 'active' if selected_category_slug == 'all' or not selected_category_slug else '' }}">
+      <i class="bi bi-grid-fill"></i> All Photos
+    </a>
+    {% for cat in categories %}
+      <a href="{{ url('gallery:list') }}?category={{ cat.slug }}"
+         class="category-pill {{ 'active' if selected_category_slug == cat.slug else '' }}">
+        {{ cat.name }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Gallery Images Grid -->
+  {% if images %}
+    <div class="gallery-grid">
+      {% for item in images %}
+        <div class="gallery-card"
+             data-full-src="{{ item.image.url if item.image else '' }}"
+             data-title="{{ item.title }}"
+             data-caption="{{ item.caption }}">
+          {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" loading="lazy">
+          {% else %}
+            <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light text-muted">
+              <i class="bi bi-camera fs-1 mb-2"></i>
+              <span class="small">{{ item.title }}</span>
+            </div>
+          {% endif %}
+          <div class="gallery-overlay">
+            <h5>{{ item.title }}</h5>
+            <p>{{ item.caption or item.category.name }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-5">
+      <i class="bi bi-images fs-1 text-muted mb-3 d-block"></i>
+      <h3>No photos available in this category</h3>
+      <p class="text-muted">Check back soon as we capture more memories.</p>
+      <a href="{{ url('gallery:list') }}" class="btn btn-cafe-primary mt-2">View All Photos</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Lightbox Modal -->
+<div class="modal fade" id="galleryLightboxModal" tabindex="-1" aria-labelledby="lightboxTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+      <div class="modal-body p-0 position-relative bg-dark text-center">
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        <img id="lightboxImage" src="" alt="Gallery Image" class="img-fluid" style="max-height: 80vh; width: auto; object-fit: contain;">
+        <div class="p-3 bg-dark text-white text-start">
+          <h5 id="lightboxTitle" class="text-white mb-1"></h5>
+          <p id="lightboxCaption" class="small text-white-50 mb-0"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

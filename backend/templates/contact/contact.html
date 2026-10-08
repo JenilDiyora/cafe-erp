@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Contact & Location | {{ cafe_settings.cafe_name if cafe_settings else 'Mitra Cafe' }}{% endblock %}
+
+{% block meta_description %}Contact Mitra Cafe for inquiries, private bookings, or visit us in Bangalore. View our opening hours, address, phone number, and directions.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: linear-gradient(135deg, #2a160c 0%, #3e2417 100%); color: #fff;">
+  <div class="container text-center py-4">
+    <span class="hero-badge"><i class="bi bi-geo-alt-fill"></i> Get in Touch</span>
+    <h1 class="display-5 fw-bold text-white mb-2">We’d Love to Hear From You</h1>
+    <p class="lead text-white-50 mx-auto" style="max-width: 650px;">
+      Have a question, feedback, or looking to host a community workshop? Send us a note or come on over!
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5">
+    <!-- Contact Information & Hours Column -->
+    <div class="col-lg-5">
+      <div class="contact-info-card overflow-hidden p-0">
+        <!-- Cafe Photograph Header -->
+        <div style="height: 190px; overflow: hidden; position: relative;">
+          <img src="/media/gallery/espresso_bar.jpg" alt="Mitra Cafe" class="w-100 h-100" style="object-fit: cover;">
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(20, 13, 8, 0.88) 0%, rgba(20, 13, 8, 0.25) 55%, transparent 100%);"></div>
+          <div style="position: absolute; bottom: 14px; left: 20px; right: 20px;">
+            <span class="badge" style="background: rgba(229, 167, 85, 0.25); color: #f3be7a; border: 1px solid rgba(229, 167, 85, 0.45); backdrop-filter: blur(4px);">
+              <i class="bi bi-geo-alt-fill me-1"></i> Surat, Gujarat
+            </span>
+            <h4 class="text-white fw-bold mb-0 mt-1">Visit Mitra Cafe</h4>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div>
+              <h6 class="mb-1 text-primary">Address</h6>
+              <p class="text-muted small mb-0">
+                <a href="{{ cafe_settings.google_maps_url if cafe_settings and cafe_settings.google_maps_url else 'https://maps.app.goo.gl/YjiYuT8wt5XhwfJC7' }}" target="_blank" rel="noopener noreferrer" class="text-reset text-decoration-none">
+                  {{ cafe_settings.address if cafe_settings else 'Mitra Cafe, Chhaprabhatha, Surat, Gujarat 394520' }}
+                  <i class="bi bi-box-arrow-up-right ms-1 small text-secondary"></i>
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="bi bi-telephone-fill"></i>
+            </div>
+            <div>
+              <h6 class="mb-1 text-primary">Phone Number</h6>
+              <p class="mb-0">
+                <a href="tel:{{ cafe_settings.phone if cafe_settings else '+917405401350' }}" class="text-muted small text-decoration-none">
+                  {{ cafe_settings.phone if cafe_settings else '+91 7405401350' }}
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">
+              <i class="bi bi-envelope-fill"></i>
+            </div>
+            <div>
+              <h6 class="mb-1 text-primary">Email Inquiry</h6>
+              <p class="mb-0">
+                <a href="mailto:{{ cafe_settings.email if cafe_settings else 'jenildiyora760@gmail.com' }}" class="text-muted small text-decoration-none">
+                  {{ cafe_settings.email if cafe_settings else 'jenildiyora760@gmail.com' }}
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <h5 class="section-subtitle-accent mb-3">
+            <i class="bi bi-clock-history me-1"></i> Opening Hours
+          </h5>
+          <ul class="list-unstyled mb-4">
+            {% for h in opening_hours %}
+              <li class="opening-hour-row d-flex justify-content-between py-1 small">
+                <span class="opening-hour-day fw-medium">{{ h.day }}</span>
+                <span class="text-muted">
+                  {% if h.is_closed %}<span class="text-danger fw-bold">Closed</span>{% else %}{{ h.opening_time }} - {{ h.closing_time }}{% endif %}
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+
+          <h5 class="section-subtitle-accent mb-3">
+            <i class="bi bi-share me-1"></i> Connect With Us
+          </h5>
+          <div class="d-flex gap-2 align-items-center">
+            {% if cafe_settings and cafe_settings.instagram_url %}
+              <a href="{{ cafe_settings.instagram_url }}" target="_blank" rel="noopener" class="social-pill-btn social-pill-instagram" title="Follow on Instagram" aria-label="Instagram">
+                <i class="bi bi-instagram"></i>
+              </a>
+            {% endif %}
+            {% if cafe_settings and cafe_settings.facebook_url %}
+              <a href="{{ cafe_settings.facebook_url }}" target="_blank" rel="noopener" class="social-pill-btn social-pill-facebook" title="Follow on Facebook" aria-label="Facebook">
+                <i class="bi bi-facebook"></i>
+              </a>
+            {% endif %}
+            {% if cafe_settings and cafe_settings.whatsapp_number %}
+              <a href="https://wa.me/{{ cafe_settings.whatsapp_number|replace(' ', '')|replace('+', '') }}" target="_blank" rel="noopener" class="social-pill-btn social-pill-whatsapp" title="Chat on WhatsApp" aria-label="WhatsApp">
+                <i class="bi bi-whatsapp"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Form Column -->
+    <div class="col-lg-7">
+      <div class="form-card">
+        <h3 class="h4 mb-2 text-primary">Send Us a Message</h3>
+        <p class="text-muted small mb-4">
+          Fill out the inquiry form below and our manager will respond within 24 business hours.
+        </p>
+
+        <form method="POST" action="{{ url('contact:index') }}" id="contactInquiryForm">
+          {{ csrf_input }}
+
+          {% if form.non_field_errors() %}
+            <div class="alert alert-danger mb-3">
+              {{ form.non_field_errors() }}
+            </div>
+          {% endif %}
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Your Name <span class="text-danger">*</span></label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="text-danger small mt-1">{{ form.name.errors[0] }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Your Email <span class="text-danger">*</span></label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <div class="text-danger small mt-1">{{ form.email.errors[0] }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Phone Number</label>
+              {{ form.phone }}
+              {% if form.phone.errors %}
+                <div class="text-danger small mt-1">{{ form.phone.errors[0] }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Subject</label>
+              {{ form.subject }}
+              {% if form.subject.errors %}
+                <div class="text-danger small mt-1">{{ form.subject.errors[0] }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label small fw-semibold">Message <span class="text-danger">*</span></label>
+              {{ form.message }}
+              {% if form.message.errors %}
+                <div class="text-danger small mt-1">{{ form.message.errors[0] }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-cafe-primary btn-lg w-100 justify-content-center">
+                <i class="bi bi-send-fill"></i> Submit Inquiry
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Maps Embed Section -->
+  <div class="mt-5 pt-3">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h4 class="h5 mb-0 d-flex align-items-center gap-2"><i class="bi bi-geo-alt-fill text-warning"></i><span>Location & Directions</span></h4>
+        <a href="{{ cafe_settings.google_maps_url if cafe_settings and cafe_settings.google_maps_url else 'https://maps.app.goo.gl/YjiYuT8wt5XhwfJC7' }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-cafe-outline">
+          <i class="bi bi-box-arrow-up-right me-1"></i>Open in Google Maps
+        </a>
+      </div>
+      <div style="height: 400px;" class="map-embed-frame">
+        <div class="cafe-interactive-map"
+             id="contactCafeMap"
+             data-lat="21.266236"
+             data-lng="72.823239"
+             data-zoom="15"
+             data-maps-url="{{ cafe_settings.google_maps_url if cafe_settings and cafe_settings.google_maps_url else 'https://maps.app.goo.gl/YjiYuT8wt5XhwfJC7' }}"
+             data-address="{{ cafe_settings.address if cafe_settings else 'Mitra Cafe, Chhaprabhatha, Surat, Gujarat 394520' }}">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

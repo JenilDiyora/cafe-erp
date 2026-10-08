@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}About Us | {{ cafe_settings.cafe_name if cafe_settings else 'Mitra Cafe' }}{% endblock %}
+
+{% block meta_description %}Learn about Mitra Cafe's journey, coffee philosophy, direct-trade sourcing, organic bakery methods, and our passionate team.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: linear-gradient(135deg, #2a160c 0%, #3e2417 100%); color: #fff;">
+  <div class="container text-center py-4">
+    <span class="hero-badge"><i class="bi bi-heart-fill"></i> Our Heart & Soul</span>
+    <h1 class="display-5 fw-bold text-white mb-2">Our Story & Passion</h1>
+    <p class="lead text-white-50 mx-auto" style="max-width: 650px;">
+      Crafting honest coffee experiences and welcoming hospitality since day one.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- 1. The Cafe Story -->
+  <div class="row align-items-center g-5 mb-5 pb-lg-4">
+    <div class="col-lg-6">
+      <span class="section-tag">How It Began</span>
+      <h2 class="section-title">Rooted in Coffee Obsession</h2>
+      <p class="lead text-muted">
+        {{ cafe_settings.about_description if cafe_settings else 'Founded with a passion for exceptional single-origin coffee and soulful culinary creations, Mitra Cafe brings people together in a vibrant community space.' }}
+      </p>
+      <p class="text-muted">
+        We set out with a simple premise: great coffee shouldn't be pretentious, but it must be uncompromising in quality. From dialing in daily espresso grind profiles to hand-shaping buttery croissants at dawn, our team pours genuine care into every step of the process.
+      </p>
+      <p class="text-muted">
+        Our cafe was designed to feel like an extension of your living room—warm timber accents, ambient acoustics, natural lighting, and the rich, comforting fragrance of freshly ground beans.
+      </p>
+    </div>
+    <div class="col-lg-6">
+      <div class="rounded-4 overflow-hidden shadow-sm bg-white border">
+        <div style="height: 250px; overflow: hidden;">
+          <img src="/media/gallery/interior_corner.jpg" alt="Mitra Cafe Interior" class="w-100 h-100" style="object-fit: cover;">
+        </div>
+        <div class="p-4">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="brand-icon" style="width: 46px; height: 46px; font-size: 1.3rem;">
+              <i class="bi bi-quote"></i>
+            </div>
+            <div>
+              <h5 class="mb-0">"Coffee is our craft; community is our heartbeat."</h5>
+              <small class="text-muted">— Head Barista & Founder</small>
+            </div>
+          </div>
+        <hr>
+        <div class="row g-3 text-center">
+          <div class="col-4">
+            <h3 class="fw-bold text-primary mb-0">100%</h3>
+            <small class="text-muted">Arabica Beans</small>
+          </div>
+          <div class="col-4">
+            <h3 class="fw-bold text-primary mb-0">24hr</h3>
+            <small class="text-muted">Cold Steeped</small>
+          </div>
+          <div class="col-4">
+            <h3 class="fw-bold text-primary mb-0">Daily</h3>
+            <small class="text-muted">Fresh Bakery</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- 2. Mission & Vision -->
+  <div class="row g-4 mb-5 pb-lg-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+        <div class="brand-icon mb-3">
+          <i class="bi bi-compass-fill"></i>
+        </div>
+        <h3 class="h4 mb-3">Our Mission</h3>
+        <p class="text-muted mb-0">
+          To champion artisanal coffee culture by sourcing traceable beans directly from responsible growers, preparing them with technical precision, and serving every cup with warmth and genuine care.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+        <div class="brand-icon mb-3">
+          <i class="bi bi-eye-fill"></i>
+        </div>
+        <h3 class="h4 mb-3">Our Vision</h3>
+        <p class="text-muted mb-0">
+          To become a beloved neighborhood sanctuary where creativity thrives, friendships deepen, and the simple joy of an extraordinary brew brings brightness to everyday life.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Quality & Ingredients -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 mb-5 bg-white">
+    <div class="text-center mb-4">
+      <span class="section-tag">Uncompromising Standards</span>
+      <h2 class="section-title">Ingredients & Craft</h2>
+      <p class="section-desc">What makes the Mitra Cafe difference?</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-3 col-sm-6 text-center">
+        <i class="bi bi-droplet-half fs-1 text-warning mb-2 d-block"></i>
+        <h5 class="h6">Triple-Filtered Water</h5>
+        <p class="small text-muted">Mineral-balanced water optimized for extracting subtle floral and chocolate tasting notes.</p>
+      </div>
+      <div class="col-md-3 col-sm-6 text-center">
+        <i class="bi bi-sun-fill fs-1 text-warning mb-2 d-block"></i>
+        <h5 class="h6">Direct-Trade Farms</h5>
+        <p class="small text-muted">We partner directly with sustainable estates in Chikmagalur, Coorg, and Ethiopia.</p>
+      </div>
+      <div class="col-md-3 col-sm-6 text-center">
+        <i class="bi bi-egg-fill fs-1 text-warning mb-2 d-block"></i>
+        <h5 class="h6">Normandy Butter & Eggs</h5>
+        <p class="small text-muted">Real cultured butter and farm-fresh organic eggs for our flake-heavy morning pastries.</p>
+      </div>
+      <div class="col-md-3 col-sm-6 text-center">
+        <i class="bi bi-cup-hot-fill fs-1 text-warning mb-2 d-block"></i>
+        <h5 class="h6">Calibrated Grinders</h5>
+        <p class="small text-muted">Micron-precision conical burrs dialed in multiple times each day for uniform extractions.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Call to Action -->
+  <div class="p-5 rounded-4 text-center text-white" style="background: linear-gradient(135deg, #2b170c 0%, #3e2417 100%);">
+    <h2 class="text-white mb-3">Ready for your next cup?</h2>
+    <p class="text-white-50 mx-auto mb-4" style="max-width: 550px;">
+      Visit us today or get in touch for special bookings, events, or inquiries.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{{ url('menu:list') }}" class="btn btn-cafe-secondary btn-lg">Browse Our Menu</a>
+      <a href="{{ url('contact:index') }}" class="btn btn-outline-light btn-lg rounded-pill">Contact Us</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

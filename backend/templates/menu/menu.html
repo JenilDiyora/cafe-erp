@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Our Menu | {{ cafe_settings.cafe_name if cafe_settings else 'Mitra Cafe' }}{% endblock %}
+
+{% block meta_description %}Explore our full cafe menu featuring artisanal espresso, hand-brewed coffees, single-origin teas, fresh bakery items, breakfast bowls, and delicious savory snacks.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5" style="background: linear-gradient(135deg, #2b170c 0%, #3e2417 100%); color: #fff;">
+  <div class="container text-center py-4">
+    <span class="hero-badge"><i class="bi bi-cup-straw"></i> Handcrafted Offerings</span>
+    <h1 class="display-5 fw-bold text-white mb-2">Our Artisan Menu</h1>
+    <p class="lead text-white-50 mx-auto" style="max-width: 650px;">
+      Carefully selected single-origin beans, house-baked pastries, and fresh wholesome dishes crafted daily.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Search & Filter Controls -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <form method="GET" action="{{ url('menu:list') }}#menu-items" class="row g-3 align-items-center">
+      <!-- Search Input -->
+      <div class="col-lg-5 col-md-6">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search coffee, pastries, snacks...">
+          {% if query %}
+            <a href="{{ url('menu:list') }}#menu-items" class="input-group-text bg-light text-decoration-none" title="Clear Search">
+              <i class="bi bi-x-circle-fill text-muted"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Category Filter Dropdown (for mobile/tablet) -->
+      <div class="col-lg-3 col-md-6">
+        <select name="category" class="form-select" onchange="this.form.submit()">
+          <option value="all" {{ 'selected' if selected_category_slug == 'all' or not selected_category_slug else '' }}>All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.slug }}" {{ 'selected' if selected_category_slug == cat.slug else '' }}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Quick Checkbox Filters -->
+      <div class="col-lg-4 col-12 d-flex flex-wrap align-items-center gap-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="veg" value="1" id="filterVeg" {{ 'checked' if veg_filter == '1' else '' }} onchange="this.form.submit()">
+          <label class="form-check-label small fw-semibold text-success" for="filterVeg">
+            <span class="dietary-tag tag-veg me-1"></span> Veg Only
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="bestseller" value="1" id="filterBestseller" {{ 'checked' if bestseller_filter == '1' else '' }} onchange="this.form.submit()">
+          <label class="form-check-label small fw-semibold text-warning" for="filterBestseller">
+            <i class="bi bi-star-fill text-warning me-1"></i> Bestseller
+          </label>
+        </div>
+        <button type="submit" class="btn btn-cafe-primary btn-sm ms-auto">
+          Filter
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Category Nav Pills -->
+  <div class="category-pills">
+    <a href="{{ url('menu:list') }}?category=all{{ '&q=' ~ query if query else '' }}{{ '&veg=1' if veg_filter else '' }}#menu-items"
+       class="category-pill {{ 'active' if selected_category_slug == 'all' or not selected_category_slug else '' }}">
+      <i class="bi bi-grid-fill"></i> All Items
+    </a>
+    {% for cat in categories %}
+      <a href="{{ url('menu:list') }}?category={{ cat.slug }}{{ '&q=' ~ query if query else '' }}{{ '&veg=1' if veg_filter else '' }}#menu-items"
+         class="category-pill {{ 'active' if selected_category_slug == cat.slug else '' }}">
+        {{ cat.name }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Smooth Scroll Anchor Target -->
+  <div id="menu-items" style="scroll-margin-top: 110px;"></div>
+
+  <!-- Active Filter Notification -->
+  {% if query or (selected_category_slug and selected_category_slug != 'all') or veg_filter or bestseller_filter %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <span class="text-muted">Showing results for:</span>
+        {% if query %}<span class="badge bg-secondary me-1">"{{ query }}"</span>{% endif %}
+        {% if selected_category %}<span class="badge bg-primary me-1">{{ selected_category.name }}</span>{% endif %}
+        {% if veg_filter %}<span class="badge bg-success me-1">Vegetarian</span>{% endif %}
+        {% if bestseller_filter %}<span class="badge bg-warning text-dark me-1">Bestsellers</span>{% endif %}
+      </div>
+      <a href="{{ url('menu:list') }}" class="btn btn-outline-secondary btn-sm">Reset Filters</a>
+    </div>
+  {% endif %}
+
+  <!-- Products Listing -->
+  {% if categorized_products %}
+    <!-- Grouped by Category -->
+    {% for group in categorized_products %}
+      <div class="mb-5" id="cat-{{ group.category.slug }}">
+        <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
+          <div>
+            <h2 class="h3 mb-1 text-primary">{{ group.category.name }}</h2>
+            {% if group.category.description %}
+              <p class="text-muted small mb-0">{{ group.category.description }}</p>
+            {% endif %}
+          </div>
+          <span class="badge rounded-pill bg-light text-dark border">{{ group.products.count() }} items</span>
+        </div>
+
+        <div class="row g-4">
+          {% for product in group.products %}
+            <div class="col-lg-4 col-md-6">
+              <div class="menu-card">
+                <div class="menu-card-img-wrap">
+                  <div class="badge-badge-wrap">
+                    {% if product.is_bestseller %}
+                      <span class="badge-bestseller"><i class="bi bi-star-fill"></i> Bestseller</span>
+                    {% endif %}
+                    {% if product.is_featured %}
+                      <span class="badge-featured"><i class="bi bi-award-fill"></i> Featured</span>
+                    {% endif %}
+                  </div>
+                  {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="menu-card-img" loading="lazy">
+                  {% else %}
+                    <div class="menu-card-fallback-icon">
+                      <i class="bi bi-cup-hot"></i>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="menu-card-header">
+                  <h3 class="menu-card-title">
+                    {{ product.name }}
+                    {% if product.vegetarian %}
+                      <span class="dietary-tag tag-veg" title="Vegetarian"></span>
+                    {% endif %}
+                    {% if product.spicy %}
+                      <span class="dietary-tag tag-spicy" title="Spicy"><i class="bi bi-fire"></i></span>
+                    {% endif %}
+                  </h3>
+                  <span class="menu-card-price">{{ product.price|currency }}</span>
+                </div>
+
+                <p class="menu-card-desc">{{ product.short_description or product.description }}</p>
+
+                {% if product.allergen_information %}
+                  <div class="small text-muted mb-2">
+                    <i class="bi bi-exclamation-circle me-1"></i> Allergens: {{ product.allergen_information }}
+                  </div>
+                {% endif %}
+
+                <div class="menu-card-footer">
+                  <span class="text-muted small"><i class="bi bi-tag me-1"></i>{{ product.category.name }}</span>
+                  {% if product.is_available %}
+                    <span class="status-available"><i class="bi bi-check-circle me-1"></i>Available</span>
+                  {% else %}
+                    <span class="status-unavailable"><i class="bi bi-x-circle me-1"></i>Sold Out</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <!-- Filtered Flat Grid -->
+    {% if products %}
+      <div class="row g-4">
+        {% for product in products %}
+          <div class="col-lg-4 col-md-6">
+            <div class="menu-card">
+              <div class="menu-card-img-wrap">
+                <div class="badge-badge-wrap">
+                  {% if product.is_bestseller %}
+                    <span class="badge-bestseller"><i class="bi bi-star-fill"></i> Bestseller</span>
+                  {% endif %}
+                  {% if product.is_featured %}
+                    <span class="badge-featured"><i class="bi bi-award-fill"></i> Featured</span>
+                  {% endif %}
+                </div>
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" class="menu-card-img" loading="lazy">
+                {% else %}
+                  <div class="menu-card-fallback-icon">
+                    <i class="bi bi-cup-hot"></i>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="menu-card-header">
+                <h3 class="menu-card-title">
+                  {{ product.name }}
+                  {% if product.vegetarian %}
+                    <span class="dietary-tag tag-veg" title="Vegetarian"></span>
+                  {% endif %}
+                  {% if product.spicy %}
+                    <span class="dietary-tag tag-spicy" title="Spicy"><i class="bi bi-fire"></i></span>
+                  {% endif %}
+                </h3>
+                <span class="menu-card-price">{{ product.price|currency }}</span>
+              </div>
+
+              <p class="menu-card-desc">{{ product.short_description or product.description }}</p>
+
+              {% if product.allergen_information %}
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-exclamation-circle me-1"></i> Allergens: {{ product.allergen_information }}
+                </div>
+              {% endif %}
+
+              <div class="menu-card-footer">
+                <span class="text-muted small"><i class="bi bi-tag me-1"></i>{{ product.category.name }}</span>
+                {% if product.is_available %}
+                  <span class="status-available"><i class="bi bi-check-circle me-1"></i>Available</span>
+                {% else %}
+                  <span class="status-unavailable"><i class="bi bi-x-circle me-1"></i>Sold Out</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-5">
+        <div class="brand-icon mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+          <i class="bi bi-search"></i>
+        </div>
+        <h3>No menu items match your search</h3>
+        <p class="text-muted">Try adjusting your filters or search keywords.</p>
+        <a href="{{ url('menu:list') }}" class="btn btn-cafe-primary mt-2">View Full Menu</a>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasCategoryParam = urlParams.has('category') && urlParams.get('category') !== 'all';
+    const hasSearchParam = urlParams.has('q') && urlParams.get('q').trim() !== '';
+    const hasFilterParam = urlParams.has('veg') || urlParams.has('bestseller') || urlParams.has('spicy');
+    const hasHash = window.location.hash === '#menu-items';
+
+    if (hasCategoryParam || hasSearchParam || hasFilterParam || hasHash) {
+      const target = document.getElementById('menu-items');
+      if (target) {
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      }
+    }
+  });
+</script>
+{% endblock %}
