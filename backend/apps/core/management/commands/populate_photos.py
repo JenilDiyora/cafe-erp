@@ -106,3 +106,4 @@ class Command(BaseCommand):
             Review.objects.filter(customer_name=customer).update(customer_image=rel_path)
 
         self.stdout.write(self.style.SUCCESS("Successfully populated and linked all photographs!"))
+

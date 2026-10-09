@@ -3,7 +3,7 @@ services:
     name: mitra-cafe
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn --chdir backend config.wsgi:application"
+    startCommand: "python manage.py migrate && python manage.py seed_cafe_data && python manage.py seed_phase2_data && python manage.py populate_photos && gunicorn --chdir backend config.wsgi:application"
     plan: free
     envVars:
       - key: DEBUG

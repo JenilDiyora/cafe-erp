@@ -3,10 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-try:
-    import dj_database_url  # type: ignore[import-not-found]
-except ImportError:  # pragma: no cover - optional in some local/dev setups
-    dj_database_url = None
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -118,20 +115,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
 # Database
-if dj_database_url is not None:
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=os.environ.get("DATABASE_URL"),
-            conn_max_age=600,
-        )
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+    )
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
