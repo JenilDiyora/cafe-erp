@@ -1208,3 +1208,37 @@ a:hover {
   background-color: #1a120c !important;
 }
 
+/* Phase 2: Ordering, Cart & OTP Custom Styles */
+.letter-spacing-lg {
+  letter-spacing: 12px;
+}
+
+.hover-shadow {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-shadow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-bs-theme="dark"] .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: #f5ede6;
+  --bs-table-border-color: #382519;
+}
+
+[data-bs-theme="dark"] .bg-light {
+  background-color: #1a120c !important;
+}
+
+[data-bs-theme="dark"] .alert-light {
+  background-color: #1a120c;
+  border-color: #382519;
+  color: #d1c5bb;
+}
+
+[data-bs-theme="dark"] .card-footer {
+  background-color: var(--accent-card) !important;
+}
+

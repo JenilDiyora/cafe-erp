@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile | Mitra Cafe{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- Left Column: Profile Card & Navigation -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 text-center mb-4">
+          <div class="brand-icon mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2.2rem; background: var(--secondary-color); color: #fff;">
+            {{ request.user.first_name[0] if request.user.first_name else request.user.username[0] | upper }}
+          </div>
+          <h2 class="h4 fw-bold mb-1">{{ request.user.get_full_name() or request.user.username }}</h2>
+          <p class="text-muted small mb-2">{{ request.user.email }}</p>
+
+          <div>
+            {% if profile.is_email_verified %}
+              <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-3 py-1">
+                <i class="bi bi-patch-check-fill me-1"></i> Verified Customer
+              </span>
+            {% else %}
+              <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-1">
+                <i class="bi bi-exclamation-circle me-1"></i> Unverified
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Account Quick Links -->
+        <div class="list-group rounded-4 shadow-sm border-0 overflow-hidden">
+          <a href="{{ url('accounts:profile') }}" class="list-group-item list-group-item-action active py-3 d-flex align-items-center gap-3">
+            <i class="bi bi-person-fill fs-5"></i>
+            <div>
+              <div class="fw-semibold">Customer Profile</div>
+              <small class="opacity-75">Personal details & contact info</small>
+            </div>
+          </a>
+          <a href="{{ url('orders:history') }}" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-3">
+            <i class="bi bi-receipt-cutoff fs-5 text-warning"></i>
+            <div>
+              <div class="fw-semibold">My Orders</div>
+              <small class="text-muted">Track past & live dine-in/takeaway orders</small>
+            </div>
+          </a>
+          <a href="{{ url('reservations:my_reservations') }}" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-3">
+            <i class="bi bi-calendar-heart fs-5 text-danger"></i>
+            <div>
+              <div class="fw-semibold">My Table Reservations</div>
+              <small class="text-muted">Upcoming bookings & history</small>
+            </div>
+          </a>
+          <a href="{{ url('accounts:logout') }}" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-3 text-danger">
+            <i class="bi bi-box-arrow-right fs-5"></i>
+            <div>
+              <div class="fw-semibold">Sign Out</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Edit Profile & Overview -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+          <h3 class="h4 fw-bold mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-gear-fill text-warning"></i> Personal Information
+          </h3>
+
+          <form method="POST" action="{{ url('accounts:profile') }}">
+            {{ csrf_input }}
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">First Name</label>
+                {{ form.first_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Last Name</label>
+                {{ form.last_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Email Address</label>
+                <input type="email" class="form-control" value="{{ request.user.email }}" disabled readonly>
+                <small class="form-text text-muted">Email is verified and cannot be changed directly.</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Phone Number</label>
+                {{ form.phone }}
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-cafe-primary mt-4 px-4 py-2">
+              <i class="bi bi-save me-1"></i> Save Changes
+            </button>
+          </form>
+        </div>
+
+        <!-- Recent Orders Snapshot -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="h5 fw-bold mb-0">Recent Orders</h4>
+            <a href="{{ url('orders:history') }}" class="btn btn-sm btn-cafe-outline">View All</a>
+          </div>
+
+          {% if recent_orders %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr class="text-muted small">
+                    <th>Order #</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for ord in recent_orders %}
+                    <tr>
+                      <td class="fw-bold">#{{ ord.order_number }}</td>
+                      <td>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis">
+                          {{ ord.get_order_type_display() }}
+                        </span>
+                      </td>
+                      <td class="small text-muted">{{ ord.created_at.strftime('%d %b %Y') }}</td>
+                      <td class="fw-semibold text-danger">₹{{ ord.total }}</td>
+                      <td>
+                        <span class="badge bg-warning-subtle text-warning-emphasis">
+                          {{ ord.get_status_display() }}
+                        </span>
+                      </td>
+                      <td>
+                        <a href="{{ url('orders:detail', kwargs={'order_number': ord.order_number}) }}" class="btn btn-sm btn-outline-secondary py-1 px-2">
+                          View
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted small mb-0">You have not placed any orders yet. <a href="{{ url('menu:list') }}">Browse our delicious menu!</a></p>
+          {% endif %}
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

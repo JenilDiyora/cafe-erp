@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Table Reservation | Mitra Cafe{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <h1 class="h2 fw-bold mb-1">Confirm Table Booking</h1>
+        <p class="text-muted small mb-4">Please verify your table reservation details and contact information</p>
+
+        <form method="POST" action="{{ url('reservations:confirm') }}">
+          {{ csrf_input }}
+
+          <!-- Booking Summary Box -->
+          <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+            <h4 class="h5 fw-bold mb-4 d-flex align-items-center gap-2">
+              <i class="bi bi-clock-history text-warning"></i> Reservation Details
+            </h4>
+
+            <div class="row g-3 p-3 bg-light rounded-4 mb-4">
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Table Assigned</span>
+                <span class="fw-bold fs-5 text-body">Table {{ table.table_number }}</span>
+                <div class="small text-muted">{{ table.location }} &bull; Max {{ table.capacity }} guests</div>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Party Size</span>
+                <span class="fw-bold fs-5 text-body">{{ guests }} Guests</span>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Date</span>
+                <span class="fw-semibold text-body">{{ reservation_date.strftime('%A, %d %B %Y') }}</span>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Dining Slot</span>
+                <span class="fw-semibold text-body">{{ start_time.strftime('%I:%M %p') }} - {{ end_time.strftime('%I:%M %p') }}</span>
+              </div>
+            </div>
+
+            <!-- Customer Details -->
+            <h4 class="h5 fw-bold mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-person-fill text-warning"></i> Customer Information
+            </h4>
+
+            <div class="row g-3 mb-4">
+              <div class="col-sm-6">
+                <label class="form-label small fw-semibold">Your Name</label>
+                <input type="text" class="form-control" value="{{ customer_name }}" readonly>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label small fw-semibold">Email Address</label>
+                <input type="email" class="form-control" value="{{ customer_email }}" readonly>
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">Contact Phone Number <span class="text-danger">*</span></label>
+                <input type="tel" name="customer_phone" class="form-control" value="{{ customer_phone }}" placeholder="10-digit mobile number" required>
+                <small class="form-text text-muted">We will SMS/WhatsApp you table confirmation updates.</small>
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">Special Requests (Optional)</label>
+                <textarea name="special_request" rows="2" class="form-control" placeholder="E.g. Birthday anniversary, high-chair needed, quiet corner requested"></textarea>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-cafe-primary btn-lg w-100 justify-content-center py-3">
+              <i class="bi bi-calendar-check-fill me-2"></i> Confirm Reservation
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

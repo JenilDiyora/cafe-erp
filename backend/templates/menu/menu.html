@@ -161,8 +161,31 @@
                     <span class="status-unavailable"><i class="bi bi-x-circle me-1"></i>Sold Out</span>
                   {% endif %}
                 </div>
+
+                <!-- Add to Cart Form -->
+                {% if product.is_available %}
+                  <form method="POST" action="{{ url('cart:add', kwargs={'product_id': product.id}) }}" class="add-to-cart-form mt-3">
+                    {{ csrf_input }}
+                    <input type="hidden" name="next" value="{{ request.get_full_path() }}">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="input-group input-group-sm" style="width: 100px;">
+                        <button class="btn btn-outline-secondary menu-qty-btn" type="button" onclick="const input = this.parentNode.querySelector('input'); input.value = Math.max(1, parseInt(input.value || 1) - 1);"><i class="bi bi-dash"></i></button>
+                        <input type="number" name="quantity" class="form-control text-center px-1 fw-bold" value="1" min="1" max="20" readonly>
+                        <button class="btn btn-outline-secondary menu-qty-btn" type="button" onclick="const input = this.parentNode.querySelector('input'); input.value = parseInt(input.value || 1) + 1;"><i class="bi bi-plus"></i></button>
+                      </div>
+                      <button type="submit" class="btn btn-cafe-primary btn-sm flex-fill py-1 px-3 d-flex align-items-center justify-content-center gap-1 add-cart-btn">
+                        <i class="bi bi-cart-plus-fill"></i> Add to Cart
+                      </button>
+                    </div>
+                  </form>
+                {% else %}
+                  <button class="btn btn-secondary btn-sm w-100 mt-3 py-1" disabled>
+                    <i class="bi bi-x-circle me-1"></i> Currently Sold Out
+                  </button>
+                {% endif %}
               </div>
             </div>
+
           {% endfor %}
         </div>
       </div>
@@ -221,8 +244,31 @@
                   <span class="status-unavailable"><i class="bi bi-x-circle me-1"></i>Sold Out</span>
                 {% endif %}
               </div>
+
+              <!-- Add to Cart Form -->
+              {% if product.is_available %}
+                <form method="POST" action="{{ url('cart:add', kwargs={'product_id': product.id}) }}" class="add-to-cart-form mt-3">
+                  {{ csrf_input }}
+                  <input type="hidden" name="next" value="{{ request.get_full_path() }}">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="input-group input-group-sm" style="width: 100px;">
+                      <button class="btn btn-outline-secondary menu-qty-btn" type="button" onclick="const input = this.parentNode.querySelector('input'); input.value = Math.max(1, parseInt(input.value || 1) - 1);"><i class="bi bi-dash"></i></button>
+                      <input type="number" name="quantity" class="form-control text-center px-1 fw-bold" value="1" min="1" max="20" readonly>
+                      <button class="btn btn-outline-secondary menu-qty-btn" type="button" onclick="const input = this.parentNode.querySelector('input'); input.value = parseInt(input.value || 1) + 1;"><i class="bi bi-plus"></i></button>
+                    </div>
+                    <button type="submit" class="btn btn-cafe-primary btn-sm flex-fill py-1 px-3 d-flex align-items-center justify-content-center gap-1 add-cart-btn">
+                      <i class="bi bi-cart-plus-fill"></i> Add to Cart
+                    </button>
+                  </div>
+                </form>
+              {% else %}
+                <button class="btn btn-secondary btn-sm w-100 mt-3 py-1" disabled>
+                  <i class="bi bi-x-circle me-1"></i> Currently Sold Out
+                </button>
+              {% endif %}
             </div>
           </div>
+
         {% endfor %}
       </div>
     {% else %}
@@ -257,6 +303,48 @@
         }, 150);
       }
     }
+
+    // Interactive AJAX Add to Cart
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('.add-cart-btn');
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Adding...';
+
+        const formData = new FormData(form);
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: formData
+          });
+          const data = await res.json();
+          if (data.status === 'success') {
+            btn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Added!';
+            btn.classList.remove('btn-cafe-primary');
+            btn.classList.add('btn-success');
+
+            const navBadge = document.getElementById('navCartBadge');
+            if (navBadge) navBadge.textContent = data.cart_count;
+
+            setTimeout(() => {
+              btn.innerHTML = origHtml;
+              btn.classList.remove('btn-success');
+              btn.classList.add('btn-cafe-primary');
+              btn.disabled = false;
+            }, 1200);
+          } else {
+            alert(data.message || 'Could not add to cart.');
+            btn.innerHTML = origHtml;
+            btn.disabled = false;
+          }
+        } catch (err) {
+          form.submit(); // Fallback to normal HTTP submit
+        }
+      });
+    });
   });
 </script>
 {% endblock %}

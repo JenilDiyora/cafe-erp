@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Your Cart | Mitra Cafe{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+      <div>
+        <h1 class="h2 fw-bold mb-1">Your Order Cart</h1>
+        <p class="text-muted small mb-0">Review your freshly handcrafted selections before checkout</p>
+      </div>
+
+      {% set table_ctx = get_table_context(request) %}
+      {% if table_ctx %}
+        <div class="d-flex align-items-center gap-2 bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill shadow-sm">
+          <span class="fs-5">🪑</span>
+          <span class="fw-bold">Table {{ table_ctx.table_number }} (Dine-in)</span>
+          <a href="{{ url('tables:clear_session') }}" class="btn btn-sm btn-link text-decoration-none text-danger p-0 ms-1" title="Switch to Takeaway">
+            <i class="bi bi-x-circle-fill"></i>
+          </a>
+        </div>
+      {% else %}
+        <div class="badge bg-secondary-subtle text-secondary-emphasis px-3 py-2 rounded-pill">
+          <i class="bi bi-bag-check-fill me-1"></i> Takeaway Order
+        </div>
+      {% endif %}
+    </div>
+
+    {% if cart_items %}
+      <div class="row g-4">
+        <!-- Items Column -->
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="bg-light">
+                  <tr class="text-muted small">
+                    <th style="min-width: 220px;" class="ps-4">Product</th>
+                    <th>Price</th>
+                    <th style="min-width: 130px;" class="text-center">Quantity</th>
+                    <th class="text-end pe-4">Subtotal</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="cartTableBody">
+                  {% for item in cart_items %}
+                    <tr id="cartItemRow-{{ item.id }}" class="border-bottom">
+                      <td class="ps-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                          {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="rounded-3" style="width: 54px; height: 54px; object-fit: cover;">
+                          {% else %}
+                            <div class="rounded-3 bg-secondary-subtle d-flex align-items-center justify-content-center text-muted" style="width: 54px; height: 54px; font-size: 1.5rem;">
+                              ☕
+                            </div>
+                          {% endif %}
+                          <div>
+                            <h6 class="fw-bold mb-0 text-body">{{ item.product.name }}</h6>
+                            <small class="text-muted">{{ item.product.category.name }}</small>
+                            {% if item.product.vegetarian %}
+                              <span class="badge bg-success-subtle text-success p-1 ms-1" title="Vegetarian"><i class="bi bi-circle-fill" style="font-size: 6px;"></i> Veg</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fw-medium">₹{{ item.product.price }}</td>
+                      <td class="text-center">
+                        <div class="input-group input-group-sm justify-content-center" style="max-width: 120px; margin: 0 auto;">
+                          <button class="btn btn-outline-secondary cart-qty-btn" type="button" data-item-id="{{ item.id }}" data-action="decrease">
+                            <i class="bi bi-dash"></i>
+                          </button>
+                          <span class="input-group-text bg-white px-3 fw-bold" id="itemQty-{{ item.id }}">{{ item.quantity }}</span>
+                          <button class="btn btn-outline-secondary cart-qty-btn" type="button" data-item-id="{{ item.id }}" data-action="increase">
+                            <i class="bi bi-plus"></i>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="text-end pe-4 fw-bold" style="color: var(--secondary-color);" id="itemSubtotal-{{ item.id }}">
+                        ₹{{ item.subtotal }}
+                      </td>
+                      <td class="pe-3">
+                        <button class="btn btn-sm btn-link text-danger p-0 cart-remove-btn" data-item-id="{{ item.id }}" title="Remove Item">
+                          <i class="bi bi-trash3-fill"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+              <a href="{{ url('menu:list') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Add More Items
+              </a>
+              <form method="POST" action="{{ url('cart:clear') }}">
+                {{ csrf_input }}
+                <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none">
+                  <i class="bi bi-x-circle me-1"></i> Clear Cart
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Column -->
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 90px;">
+            <h4 class="h5 fw-bold mb-3">Order Summary</h4>
+
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Subtotal</span>
+              <span class="fw-semibold" id="cartSummarySubtotal">₹{{ subtotal }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Cafe GST (5%)</span>
+              <span class="fw-semibold" id="cartSummaryTax">₹{{ tax }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-3 mb-3 border-bottom">
+              <span class="fs-5 fw-bold">Grand Total</span>
+              <span class="fs-5 fw-bold text-danger" id="cartSummaryTotal">₹{{ total }}</span>
+            </div>
+
+            <a href="{{ url('orders:checkout') }}" class="btn btn-cafe-primary btn-lg w-100 justify-content-center py-3">
+              <i class="bi bi-bag-check-fill me-2"></i> Proceed to Checkout
+            </a>
+
+            <div class="text-center mt-3 text-muted small">
+              <i class="bi bi-shield-check me-1"></i> Safe & verified cafe ordering
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      <!-- Empty Cart State -->
+      <div class="card border-0 shadow-sm rounded-4 text-center p-5 my-4">
+        <div class="brand-icon mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(229, 167, 85, 0.15); color: var(--secondary-color);">
+          <i class="bi bi-cart-x"></i>
+        </div>
+        <h2 class="h4 fw-bold mb-2">Your Cart is Empty</h2>
+        <p class="text-muted small mb-4" style="max-width: 400px; margin: 0 auto;">
+          Looks like you haven't added any artisanal coffees or savory treats yet.
+        </p>
+        <div>
+          <a href="{{ url('menu:list') }}" class="btn btn-cafe-primary px-4 py-2">
+            <i class="bi bi-cup-hot-fill me-1"></i> Explore Our Menu
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- AJAX Cart Interaction Script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+
+  // Quantity increase / decrease buttons
+  document.querySelectorAll('.cart-qty-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const itemId = btn.dataset.itemId;
+      const action = btn.dataset.action;
+
+      const formData = new FormData();
+      formData.append('action', action);
+      formData.append('csrfmiddlewaretoken', csrfToken);
+
+      try {
+        const res = await fetch(`/cart/update/${itemId}/`, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          if (data.item_deleted) {
+            document.getElementById(`cartItemRow-${itemId}`)?.remove();
+            if (data.cart_count === 0) window.location.reload();
+          } else {
+            const qtySpan = document.getElementById(`itemQty-${itemId}`);
+            const subtotalSpan = document.getElementById(`itemSubtotal-${itemId}`);
+            if (qtySpan) qtySpan.textContent = data.item_quantity;
+            if (subtotalSpan) subtotalSpan.textContent = `₹${data.item_subtotal}`;
+          }
+          // Update summary totals
+          const summarySubtotal = document.getElementById('cartSummarySubtotal');
+          const summaryTax = document.getElementById('cartSummaryTax');
+          const summaryTotal = document.getElementById('cartSummaryTotal');
+          if (summarySubtotal) summarySubtotal.textContent = `₹${data.subtotal}`;
+          if (summaryTax) summaryTax.textContent = `₹${data.tax}`;
+          if (summaryTotal) summaryTotal.textContent = `₹${data.total}`;
+
+          // Update navbar badge if present
+          const navBadge = document.getElementById('navCartBadge');
+          if (navBadge) navBadge.textContent = data.cart_count;
+        }
+      } catch (err) {
+        console.error('Cart update failed', err);
+      }
+    });
+  });
+
+  // Remove item button
+  document.querySelectorAll('.cart-remove-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const itemId = btn.dataset.itemId;
+      const formData = new FormData();
+      formData.append('csrfmiddlewaretoken', csrfToken);
+
+      try {
+        const res = await fetch(`/cart/remove/${itemId}/`, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          document.getElementById(`cartItemRow-${itemId}`)?.remove();
+          if (data.cart_count === 0) {
+            window.location.reload();
+          } else {
+            const summarySubtotal = document.getElementById('cartSummarySubtotal');
+            const summaryTax = document.getElementById('cartSummaryTax');
+            const summaryTotal = document.getElementById('cartSummaryTotal');
+            if (summarySubtotal) summarySubtotal.textContent = `₹${data.subtotal}`;
+            if (summaryTax) summaryTax.textContent = `₹${data.tax}`;
+            if (summaryTotal) summaryTotal.textContent = `₹${data.total}`;
+            const navBadge = document.getElementById('navCartBadge');
+            if (navBadge) navBadge.textContent = data.cart_count;
+          }
+        }
+      } catch (err) {
+        console.error('Cart remove failed', err);
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

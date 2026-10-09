@@ -1,5 +1,18 @@
 {% set cafe = get_cafe_settings() %}
+{% set table_ctx = get_table_context(request) %}
+{% set cart_count = get_cart_count(request) %}
+
 <header>
+  <!-- Table Dine-in Alert Bar if seated -->
+  {% if table_ctx %}
+    <div class="bg-warning text-dark py-1 px-3 text-center small fw-semibold d-flex justify-content-center align-items-center gap-2">
+      <span>🪑 Seated at Table {{ table_ctx.table_number }} (Dine-in Order)</span>
+      <a href="{{ url('tables:clear_session') }}" class="text-dark text-decoration-underline ms-2" title="Switch back to takeaway">
+        (Exit Table)
+      </a>
+    </div>
+  {% endif %}
+
   <nav class="navbar navbar-expand-lg cafe-navbar sticky-top">
     <div class="container">
       <a class="navbar-brand" href="{{ url('core:home') }}">
@@ -24,6 +37,11 @@
             <a class="nav-link {{ 'active' if '/menu/' in request.path else '' }}" href="{{ url('menu:list') }}">Menu</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link {{ 'active' if '/reservations/' in request.path else '' }}" href="{{ url('reservations:book') }}">
+              <i class="bi bi-calendar2-check me-1"></i> Book Table
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link {{ 'active' if '/about/' in request.path else '' }}" href="{{ url('core:about') }}">About Us</a>
           </li>
           <li class="nav-item">
@@ -37,16 +55,66 @@
           </li>
         </ul>
 
-        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0 flex-wrap">
+          <!-- Dark Mode Toggle -->
           <button id="themeToggleBtn" type="button" class="btn btn-outline-secondary btn-sm rounded-circle d-inline-flex align-items-center justify-content-center theme-toggle-btn" style="width: 36px; height: 36px;" aria-label="Toggle dark mode" title="Toggle dark mode">
             <i class="bi bi-moon-stars-fill"></i>
           </button>
-          <a href="{{ url('admin:index') }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" title="Django Admin Dashboard">
-            <i class="bi bi-shield-lock-fill me-1"></i> Admin
+
+          <!-- Cart Button with Live Badge -->
+          <a href="{{ url('cart:detail') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1" title="View Cart">
+            <i class="bi bi-cart3"></i>
+            <span>Cart</span>
+            <span class="badge bg-danger rounded-pill" id="navCartBadge">{{ cart_count }}</span>
           </a>
-          <a href="{{ url('contact:index') }}" class="btn btn-cafe-primary btn-sm px-3 py-2">
-            <i class="bi bi-telephone-fill"></i> Contact Us
-          </a>
+
+          <!-- Customer Account / Auth Dropdown -->
+          {% if request.user.is_authenticated %}
+            <div class="dropdown">
+              <button class="btn btn-cafe-primary btn-sm rounded-pill px-3 py-1 dropdown-toggle d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle"></i>
+                <span>{{ request.user.first_name or request.user.username }}</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 mt-2">
+                <li>
+                  <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ url('accounts:profile') }}">
+                    <i class="bi bi-person-fill text-muted"></i> My Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ url('orders:history') }}">
+                    <i class="bi bi-receipt-cutoff text-warning"></i> My Orders
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ url('reservations:my_reservations') }}">
+                    <i class="bi bi-calendar-heart text-danger"></i> My Reservations
+                  </a>
+                </li>
+                {% if request.user.is_staff %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ url('admin:index') }}" target="_blank">
+                      <i class="bi bi-shield-lock-fill text-primary"></i> Admin Dashboard
+                    </a>
+                  </li>
+                {% endif %}
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item py-2 text-danger d-flex align-items-center gap-2" href="{{ url('accounts:logout') }}">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                  </a>
+                </li>
+              </ul>
+            </div>
+          {% else %}
+            <a href="{{ url('accounts:login') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1">
+              Sign In
+            </a>
+            <a href="{{ url('accounts:register') }}" class="btn btn-cafe-primary btn-sm rounded-pill px-3 py-1">
+              Register
+            </a>
+          {% endif %}
         </div>
       </div>
     </div>

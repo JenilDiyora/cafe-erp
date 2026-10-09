@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed #{{ order.order_number }} | Mitra Cafe{% endblock %}
+
+{% block content %}
+<section class="py-5" style="min-height: 80vh;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-4 p-md-5 text-center">
+          <div class="brand-icon mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2.2rem; background: rgba(34, 197, 94, 0.15); color: #16a34a;">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+
+          <h1 class="h2 fw-bold mb-1">Order Confirmed!</h1>
+          <p class="text-muted small mb-4">
+            Thank you, {{ order.customer_name }}! We have received your order and our kitchen has started working on it.
+          </p>
+
+          <!-- Key Order Metadata Box -->
+          <div class="bg-light p-4 rounded-4 mb-4 text-start">
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Order Reference</span>
+                <span class="fw-bold fs-5 text-body">#{{ order.order_number }}</span>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Dining Type</span>
+                {% if order.table %}
+                  <span class="badge bg-warning text-dark px-3 py-2 fw-bold">🪑 Dine-in (Table {{ order.table.table_number }})</span>
+                {% else %}
+                  <span class="badge bg-secondary px-3 py-2 fw-bold">🛍 Takeaway</span>
+                {% endif %}
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Status</span>
+                <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2">
+                  <i class="bi bi-hourglass-split me-1"></i> {{ order.get_status_display() }}
+                </span>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Date & Time</span>
+                <span class="small fw-semibold text-body">{{ order.created_at.strftime('%d %B %Y, %I:%M %p') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <div class="table-responsive mb-4 text-start">
+            <table class="table align-middle">
+              <thead>
+                <tr class="text-muted small">
+                  <th>Item</th>
+                  <th class="text-center">Qty</th>
+                  <th class="text-end">Price</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in items %}
+                  <tr>
+                    <td class="fw-semibold text-body">{{ item.product_name }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end text-muted">₹{{ item.unit_price }}</td>
+                    <td class="text-end fw-bold">₹{{ item.subtotal }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end text-muted small pt-3">Subtotal:</td>
+                  <td class="text-end pt-3 fw-semibold">₹{{ order.subtotal }}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end text-muted small">Cafe GST (5%):</td>
+                  <td class="text-end fw-semibold">₹{{ order.tax }}</td>
+                </tr>
+                <tr class="border-top">
+                  <td colspan="3" class="text-end fs-5 fw-bold">Grand Total:</td>
+                  <td class="text-end fs-5 fw-bold text-danger">₹{{ order.total }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {% if order.notes %}
+            <div class="alert alert-light border text-start small mb-4">
+              <strong>Special Instructions:</strong> {{ order.notes }}
+            </div>
+          {% endif %}
+
+          <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url('orders:detail', kwargs={'order_number': order.order_number}) }}" class="btn btn-cafe-primary px-4">
+              <i class="bi bi-clock-history me-1"></i> Track Live Status
+            </a>
+            <a href="{{ url('menu:list') }}" class="btn btn-outline-secondary px-4">
+              <i class="bi bi-cup-hot me-1"></i> Back to Menu
+            </a>
+          </div>
+
+          <div class="mt-4 pt-3 text-muted small border-top">
+            {% if is_smtp_configured() %}
+              A confirmation receipt has been sent to <strong>{{ order.customer_email }}</strong>.
+            {% else %}
+              Order recorded! In development mode, confirmation email is logged to the server console. Set <code>EMAIL_HOST_PASSWORD</code> in <code>backend/.env</code> for live inbox dispatch.
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,4 +1,4 @@
-"""Jinja2 environment configuration for Django."""
+"""Jinja2 environment configuration for Django with Phase 2 globals."""
 from jinja2 import Environment
 from django.urls import reverse
 from django.templatetags.static import static
@@ -33,14 +33,49 @@ def get_opening_hours_list():
         return []
 
 
+def get_cart_count(request):
+    """Retrieve the total quantity of items currently in customer's cart."""
+    if not request:
+        return 0
+    try:
+        from apps.cart.models import Cart
+        cart = Cart.get_or_create_cart(request)
+        return cart.get_item_count()
+    except Exception:
+        return 0
+
+
+def get_table_context(request):
+    """Retrieve table session context for dine-in badge and order flow."""
+    if not request or not hasattr(request, 'session'):
+        return None
+    table_id = request.session.get('table_id')
+    table_number = request.session.get('table_number')
+    if table_id and table_number:
+        return {
+            'table_id': table_id,
+            'table_number': table_number,
+            'table_token': request.session.get('table_token'),
+            'order_type': 'DINE_IN',
+        }
+    return None
+
+
 def format_currency(value):
     """Format decimal/float as Indian Rupee or standard currency."""
     if value is None:
         return "₹0.00"
     try:
-        return f"₹{float(value):,.2f}".rstrip('0').rstrip('.') if float(value).is_integer() else f"₹{float(value):,.2f}"
+        val = float(value)
+        return f"₹{val:,.2f}".rstrip('0').rstrip('.') if val.is_integer() else f"₹{val:,.2f}"
     except (ValueError, TypeError):
         return f"₹{value}"
+
+
+def is_smtp_configured():
+    """Check if real SMTP credentials are configured."""
+    from django.conf import settings
+    return bool(getattr(settings, 'EMAIL_HOST_PASSWORD', ''))
 
 
 def environment(**options):
@@ -54,6 +89,11 @@ def environment(**options):
         'get_messages': get_messages,
         'get_cafe_settings': get_active_cafe_settings,
         'get_opening_hours': get_opening_hours_list,
+        'csrf_input': csrf_input,
+        'csrf_field': csrf_input,
+        'get_cart_count': get_cart_count,
+        'get_table_context': get_table_context,
+        'is_smtp_configured': is_smtp_configured,
         'range': range,
         'len': len,
         'min': min,

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.order_number }} | Mitra Cafe{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+
+        <div class="mb-4">
+          <a href="{{ url('orders:history') }}" class="btn btn-sm btn-outline-secondary mb-2">
+            <i class="bi bi-arrow-left me-1"></i> Back to All Orders
+          </a>
+          <h1 class="h2 fw-bold mb-1">Order #{{ order.order_number }}</h1>
+          <p class="text-muted small">Placed on {{ order.created_at.strftime('%A, %d %B %Y at %I:%M %p') }}</p>
+        </div>
+
+        <!-- Live Visual Progress Stepper -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-4">Live Order Progress</h5>
+
+          {% if order.status == 'CANCELLED' %}
+            <div class="alert alert-danger rounded-3 mb-0">
+              <i class="bi bi-x-circle-fill me-2"></i> This order was cancelled.
+            </div>
+          {% else %}
+            {% set statuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'COMPLETED'] %}
+            {% set current_idx = 0 %}
+            {% if order.status == 'CONFIRMED' %}{% set current_idx = 1 %}
+            {% elif order.status == 'PREPARING' %}{% set current_idx = 2 %}
+            {% elif order.status == 'READY' %}{% set current_idx = 3 %}
+            {% elif order.status == 'COMPLETED' %}{% set current_idx = 4 %}
+            {% endif %}
+
+            <div class="d-flex justify-content-between position-relative px-2 py-3">
+              <!-- Stepper bar -->
+              <div class="position-absolute top-50 start-0 translate-middle-y w-100 bg-secondary-subtle" style="height: 4px; z-index: 1;"></div>
+              <div class="position-absolute top-50 start-0 translate-middle-y bg-success" style="height: 4px; width: {{ (current_idx / 4) * 100 }}%; z-index: 1; transition: width 0.4s ease;"></div>
+
+              {% for step in ['Pending', 'Confirmed', 'Preparing', 'Ready', 'Completed'] %}
+                {% set step_idx = loop.index0 %}
+                <div class="text-center position-relative" style="z-index: 2;">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 fw-bold {{ 'bg-success text-white' if step_idx <= current_idx else 'bg-light text-muted border' }}" style="width: 38px; height: 38px; font-size: 0.9rem;">
+                    {% if step_idx < current_idx %}
+                      <i class="bi bi-check-lg"></i>
+                    {% elif step_idx == current_idx %}
+                      <i class="bi bi-circle-fill" style="font-size: 8px;"></i>
+                    {% else %}
+                      {{ loop.index }}
+                    {% endif %}
+                  </div>
+                  <span class="small fw-semibold d-none d-sm-block {{ 'text-success' if step_idx <= current_idx else 'text-muted' }}">
+                    {{ step }}
+                  </span>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Order Information Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+          <div class="row g-4 mb-4 pb-4 border-bottom">
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Dining Type</span>
+              {% if order.table %}
+                <span class="fw-bold fs-5 text-warning-emphasis">🪑 Table {{ order.table.table_number }} (Dine-in)</span>
+                <div class="small text-muted">{{ order.table.location }}</div>
+              {% else %}
+                <span class="fw-bold fs-5 text-body">🛍 Takeaway</span>
+                <div class="small text-muted">Counter Pickup</div>
+              {% endif %}
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Customer Details</span>
+              <span class="fw-bold text-body">{{ order.customer_name }}</span>
+              <div class="small text-muted">{{ order.customer_phone }} &bull; {{ order.customer_email }}</div>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <h5 class="fw-bold mb-3">Items Ordered</h5>
+          <div class="table-responsive mb-4">
+            <table class="table align-middle">
+              <thead>
+                <tr class="text-muted small">
+                  <th>Product</th>
+                  <th class="text-center">Quantity</th>
+                  <th class="text-end">Price</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in items %}
+                  <tr>
+                    <td class="fw-semibold text-body">{{ item.product_name }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end text-muted">₹{{ item.unit_price }}</td>
+                    <td class="text-end fw-bold">₹{{ item.subtotal }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end text-muted small pt-3">Subtotal:</td>
+                  <td class="text-end pt-3 fw-semibold">₹{{ order.subtotal }}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end text-muted small">Cafe GST (5%):</td>
+                  <td class="text-end fw-semibold">₹{{ order.tax }}</td>
+                </tr>
+                <tr class="border-top">
+                  <td colspan="3" class="text-end fs-5 fw-bold">Total:</td>
+                  <td class="text-end fs-5 fw-bold text-danger">₹{{ order.total }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {% if order.notes %}
+            <div class="alert alert-light border small mb-0">
+              <strong>Special Instructions:</strong> {{ order.notes }}
+            </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

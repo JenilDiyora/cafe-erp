@@ -15,6 +15,11 @@ urlpatterns = [
     path('gallery/', include('apps.gallery.urls')),
     path('reviews/', include('apps.reviews.urls')),
     path('contact/', include('apps.contact.urls')),
+    path('account/', include('apps.accounts.urls', namespace='accounts')),
+    path('table/', include('apps.tables.urls', namespace='tables')),
+    path('cart/', include('apps.cart.urls', namespace='cart')),
+    path('orders/', include('apps.orders.urls', namespace='orders')),
+    path('reservations/', include('apps.reservations.urls', namespace='reservations')),
 ]
 
 # Serve media and static files in development

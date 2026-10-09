@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Book a Table | Mitra Cafe{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+
+    <div class="text-center mb-5" style="max-width: 650px; margin: 0 auto;">
+      <span class="section-tag">Reservations</span>
+      <h1 class="h2 fw-bold mb-2">Book Your Dining Experience</h1>
+      <p class="text-muted small">
+        Reserve an artisanal coffee table at Mitra Cafe in advance for intimate dates, family gatherings, or business discussions.
+      </p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+
+        <!-- Search Form Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5">
+          <h3 class="h5 fw-bold mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-check-fill text-warning"></i> Select Date, Time & Guests
+          </h3>
+
+          <form method="GET" action="{{ url('reservations:book') }}">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Reservation Date <span class="text-danger">*</span></label>
+                <input type="date" name="date" class="form-control" value="{{ selected_date }}" min="{{ min_date }}" required>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Arrival Time <span class="text-danger">*</span></label>
+                <select name="time" class="form-select" required>
+                  {% for t_val, t_label in [
+                    ('09:00', '09:00 AM - Morning Coffee'),
+                    ('10:00', '10:00 AM'),
+                    ('11:00', '11:00 AM'),
+                    ('12:00', '12:00 PM - Lunch'),
+                    ('13:00', '01:00 PM - Lunch'),
+                    ('14:00', '02:00 PM'),
+                    ('15:00', '03:00 PM'),
+                    ('16:00', '04:00 PM - High Tea'),
+                    ('17:00', '05:00 PM'),
+                    ('18:00', '06:00 PM - Evening'),
+                    ('19:00', '07:00 PM - Dinner'),
+                    ('19:30', '07:30 PM - Dinner'),
+                    ('20:00', '08:00 PM - Dinner'),
+                    ('21:00', '09:00 PM - Late Brew')
+                  ] %}
+                    <option value="{{ t_val }}" {{ 'selected' if selected_time == t_val else '' }}>{{ t_label }}</option>
+                  {% endfor %}
+                </select>
+                <small class="form-text text-muted">Table reserved for 90 minutes.</small>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Number of Guests <span class="text-danger">*</span></label>
+                <select name="guests" class="form-select" required>
+                  {% for g in [1, 2, 3, 4, 5, 6, 8, 10, 12] %}
+                    <option value="{{ g }}" {{ 'selected' if guests == g else '' }}>{{ g }} Person{{ 's' if g > 1 else '' }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-cafe-primary w-100 py-3 mt-4 justify-content-center">
+              <i class="bi bi-search me-2"></i> Check Table Availability
+            </button>
+          </form>
+        </div>
+
+        <!-- Available Tables Section -->
+        {% if searched %}
+          <div class="mb-5">
+            <h3 class="h4 fw-bold mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-geo-alt-fill text-warning"></i> Available Tables for {{ selected_date }} at {{ selected_time }}
+            </h3>
+
+            {% if available_tables and available_tables.count() > 0 %}
+              <div class="row g-4">
+                {% for table in available_tables %}
+                  <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100 d-flex flex-column justify-content-between hover-shadow transition">
+                      <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="badge bg-dark text-warning px-3 py-2 rounded-pill fw-bold">
+                            Table {{ table.table_number }}
+                          </span>
+                          <span class="badge bg-light text-muted border">
+                            <i class="bi bi-people-fill me-1"></i> Up to {{ table.capacity }}
+                          </span>
+                        </div>
+                        <h5 class="fw-bold mb-1">{{ table.table_name or ('Table ' ~ table.table_number) }}</h5>
+                        <p class="text-muted small mb-3">
+                          <i class="bi bi-compass me-1"></i> {{ table.location }}
+                        </p>
+                      </div>
+
+                      <form method="POST" action="{{ url('reservations:book') }}">
+                        {{ csrf_input }}
+                        <input type="hidden" name="table_id" value="{{ table.id }}">
+                        <input type="hidden" name="date" value="{{ selected_date }}">
+                        <input type="hidden" name="time" value="{{ selected_time }}">
+                        <input type="hidden" name="guests" value="{{ guests }}">
+
+                        <button type="submit" class="btn btn-cafe-primary w-100 justify-content-center">
+                          <i class="bi bi-check2-circle me-1"></i> Select Table
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="alert alert-warning border-0 rounded-4 p-4 text-center">
+                <i class="bi bi-calendar-x fs-1 d-block mb-2 text-warning"></i>
+                <h5 class="fw-bold">No Tables Available For This Slot</h5>
+                <p class="small text-muted mb-0">
+                  All tables with capacity for {{ guests }} guests are currently booked for this time. Please try selecting a different arrival time or date.
+                </p>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

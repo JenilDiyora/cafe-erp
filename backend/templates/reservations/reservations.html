@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}My Table Reservations | Mitra Cafe{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div>
+        <h1 class="h2 fw-bold mb-1">My Table Reservations</h1>
+        <p class="text-muted small mb-0">View your upcoming dining bookings and past visits</p>
+      </div>
+      <a href="{{ url('reservations:book') }}" class="btn btn-cafe-primary">
+        <i class="bi bi-calendar-plus me-1"></i> Book a Table
+      </a>
+    </div>
+
+    {% if reservations %}
+      <div class="row g-4">
+        {% for res in reservations %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 d-flex flex-column justify-content-between hover-shadow transition">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-dark text-warning px-3 py-2 rounded-pill fw-bold">
+                    Table {{ res.table.table_number }}
+                  </span>
+                  {% if res.status == 'CONFIRMED' %}
+                    <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-2">Confirmed</span>
+                  {% elif res.status == 'CANCELLED' %}
+                    <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill px-2">Cancelled</span>
+                  {% elif res.status == 'COMPLETED' %}
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-2">Completed</span>
+                  {% else %}
+                    <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-2">{{ res.get_status_display() }}</span>
+                  {% endif %}
+                </div>
+
+                <h5 class="fw-bold mb-1 text-body">Ref #{{ res.reservation_number }}</h5>
+                <p class="text-muted small mb-3">{{ res.table.location }}</p>
+
+                <div class="p-3 bg-light rounded-3 small mb-3">
+                  <div class="mb-1">
+                    <i class="bi bi-calendar-event me-2 text-warning"></i>
+                    <strong>{{ res.reservation_date.strftime('%a, %d %b %Y') }}</strong>
+                  </div>
+                  <div class="mb-1">
+                    <i class="bi bi-clock me-2 text-warning"></i>
+                    {{ res.start_time.strftime('%I:%M %p') }} - {{ res.end_time.strftime('%I:%M %p') }}
+                  </div>
+                  <div>
+                    <i class="bi bi-people me-2 text-warning"></i>
+                    {{ res.guest_count }} Guest{{ 's' if res.guest_count > 1 else '' }}
+                  </div>
+                </div>
+
+                {% if res.special_request %}
+                  <p class="small text-muted fst-italic mb-3">"{{ res.special_request }}"</p>
+                {% endif %}
+              </div>
+
+              <div class="d-flex gap-2 mt-2">
+                <a href="{{ url('reservations:detail', kwargs={'reservation_number': res.reservation_number}) }}" class="btn btn-outline-secondary btn-sm flex-fill">
+                  View Details
+                </a>
+                {% if res.status == 'CONFIRMED' and res.reservation_date >= today %}
+                  <form method="POST" action="{{ url('reservations:cancel', kwargs={'reservation_number': res.reservation_number}) }}" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+                    {{ csrf_input }}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                      Cancel
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm rounded-4 text-center p-5">
+        <div class="brand-icon mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2.2rem; background: rgba(229, 167, 85, 0.15); color: var(--secondary-color);">
+          <i class="bi bi-calendar-heart"></i>
+        </div>
+        <h2 class="h4 fw-bold mb-2">No Reservations Yet</h2>
+        <p class="text-muted small mb-4">Planning a special cafe visit? Book a cozy table in advance!</p>
+        <div>
+          <a href="{{ url('reservations:book') }}" class="btn btn-cafe-primary px-4 py-2">
+            <i class="bi bi-calendar-plus me-1"></i> Book a Table
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

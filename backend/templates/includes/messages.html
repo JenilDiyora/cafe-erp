@@ -3,11 +3,15 @@
 {% if messages %}
   <div class="container mt-3">
     {% for message in messages %}
-      <div class="alert alert-{{ 'success' if message.tags == 'success' else ('danger' if message.tags == 'error' else 'info') }} alert-dismissible fade show shadow-sm" role="alert">
+      {% set tag = message.tags or '' %}
+      {% set alert_type = 'success' if 'success' in tag else ('danger' if 'error' in tag else ('warning' if 'warning' in tag else 'info')) %}
+      <div class="alert alert-{{ alert_type }} alert-dismissible fade show shadow-sm" role="alert">
         <div class="d-flex align-items-center">
-          {% if message.tags == 'success' %}
+          {% if alert_type == 'success' %}
             <i class="bi bi-check-circle-fill fs-5 me-2"></i>
-          {% elif message.tags == 'error' %}
+          {% elif alert_type == 'danger' %}
+            <i class="bi bi-exclamation-octagon-fill fs-5 me-2"></i>
+          {% elif alert_type == 'warning' %}
             <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
           {% else %}
             <i class="bi bi-info-circle-fill fs-5 me-2"></i>

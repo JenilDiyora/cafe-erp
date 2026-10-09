@@ -150,7 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      const popup = new maplibregl.Popup({ offset: 25, closeButton: true }).setHTML(`
+      const popup = new maplibregl.Popup({
+        offset: 25,
+        closeButton: true,
+        focusAfterOpen: false
+      }).setHTML(`
         <div class="p-1 text-center" style="min-width: 200px;">
           <h6 class="fw-bold mb-1" style="color: var(--secondary-color);">☕ Mitra Cafe</h6>
           <p class="small mb-2 text-muted" style="line-height: 1.4;">${address}</p>
@@ -164,9 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .setLngLat([lng, lat])
         .setPopup(popup)
         .addTo(map);
-
-      // Open popup by default
-      marker.togglePopup();
 
       maps.push({ map, marker, pinEl });
     });
