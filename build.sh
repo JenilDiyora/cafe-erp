@@ -16,3 +16,5 @@ python manage.py migrate
 python manage.py seed_cafe_data
 python manage.py seed_phase2_data
 
+# Download and link gallery photos, product images, and review avatars
+python manage.py populate_photos
