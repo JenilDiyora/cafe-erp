@@ -117,13 +117,41 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-# Database
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
+# Database: Use PostgreSQL if present, otherwise fall back to SQLite3
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    db_config = dj_database_url.config(
+        default=DATABASE_URL,
         conn_max_age=600,
     )
-}
+    # If configured for PostgreSQL, ensure the server is reachable; if not present, fall back to SQLite3
+    if db_config.get("ENGINE") == "django.db.backends.postgresql":
+        host = db_config.get("HOST") or "127.0.0.1"
+        if host in ("127.0.0.1", "localhost"):
+            import socket
+            port = int(db_config.get("PORT") or 5432)
+            try:
+                with socket.create_connection((host, port), timeout=0.3):
+                    DATABASES = {"default": db_config}
+            except (socket.timeout, OSError):
+                DATABASES = {
+                    "default": {
+                        "ENGINE": "django.db.backends.sqlite3",
+                        "NAME": BASE_DIR / "db.sqlite3",
+                    }
+                }
+        else:
+            DATABASES = {"default": db_config}
+    else:
+        DATABASES = {"default": db_config}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
