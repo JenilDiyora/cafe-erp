@@ -43,7 +43,7 @@ class Command(BaseCommand):
             )
             # Generate QR code if missing
             if not table.qr_image:
-                table.generate_qr_code(base_url="http://127.0.0.1:8000")
+                table.generate_qr_code()
             created_tables.append(table)
             self.stdout.write(f"  [OK] {table.table_number} ({table.location}, Seats {table.capacity}) [Token: {table.qr_token[:8]}...]")
 

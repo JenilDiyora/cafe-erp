@@ -42,12 +42,21 @@ class CafeTable(models.Model):
         if not self.qr_token:
             self.qr_token = secrets.token_urlsafe(24)
         super().save(*args, **kwargs)
+        # Auto-generate QR code image if not yet created
+        if not self.qr_image:
+            self.generate_qr_code()
 
     def get_absolute_url(self):
         return reverse('tables:table_entry', kwargs={'qr_token': self.qr_token})
 
-    def generate_qr_code(self, base_url="http://127.0.0.1:8000"):
+    def generate_qr_code(self, base_url=None):
         """Generate high-resolution QR image pointing to table URL and save to model."""
+        if not base_url:
+            from django.conf import settings
+            base_url = getattr(settings, 'SITE_URL', '')
+            if not base_url:
+                base_url = 'https://cafe-erp.onrender.com' if not getattr(settings, 'DEBUG', True) else 'http://127.0.0.1:8000'
+
         target_url = f"{base_url.rstrip('/')}/table/{self.qr_token}/"
 
         qr = qrcode.QRCode(
@@ -65,6 +74,13 @@ class CafeTable(models.Model):
         buffer = BytesIO()
         img.save(buffer, format='PNG')
         file_name = f"table_{self.table_number.replace(' ', '_').lower()}_{self.qr_token[:8]}.png"
+
+        # Delete previous QR image file if present to prevent duplicate accumulation
+        if self.qr_image:
+            try:
+                self.qr_image.delete(save=False)
+            except Exception:
+                pass
 
         self.qr_image.save(file_name, File(buffer), save=False)
         self.save(update_fields=['qr_image', 'updated_at'])

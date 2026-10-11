@@ -33,6 +33,9 @@ else:
         if host.strip()
     ]
 
+# Base domain URL for table QR code generation and notifications
+SITE_URL = os.environ.get('SITE_URL', 'https://cafe-erp.onrender.com' if not DEBUG else 'http://127.0.0.1:8000')
+
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)

@@ -80,3 +80,21 @@ class AdminQRPrintView(View):
             'page_title': f'Print QR Stand - {table.table_number}',
         })
 
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminQRPrintAllView(View):
+    """Staff view to print branded QR stands for all active tables in a single print batch."""
+
+    def get(self, request):
+        base_url = request.build_absolute_uri('/')
+        tables = CafeTable.objects.filter(is_active=True).order_by('table_number')
+
+        for table in tables:
+            if not table.qr_image:
+                table.generate_qr_code(base_url=base_url)
+
+        return render(request, 'tables/qr_print_all.html', {
+            'tables': tables,
+            'page_title': 'Print All Table QR Stands - Mitra Cafe',
+        })
+
