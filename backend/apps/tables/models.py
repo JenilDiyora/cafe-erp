@@ -70,18 +70,18 @@ class CafeTable(models.Model):
 
         img = qr.make_image(fill_color="#2d1810", back_color="#ffffff").convert('RGB')
 
-        # Add branded border / padding if needed
+        # Save with stable filename to avoid git file deletion / hash suffix churn
         buffer = BytesIO()
         img.save(buffer, format='PNG')
-        file_name = f"table_{self.table_number.replace(' ', '_').lower()}_{self.qr_token[:8]}.png"
 
-        # Delete previous QR image file if present to prevent duplicate accumulation
-        if self.qr_image:
-            try:
-                self.qr_image.delete(save=False)
-            except Exception:
-                pass
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
 
-        self.qr_image.save(file_name, File(buffer), save=False)
+        rel_path = f"qr_codes/table_{self.table_number.replace(' ', '_').lower()}.png"
+        if default_storage.exists(rel_path):
+            default_storage.delete(rel_path)
+
+        saved_name = default_storage.save(rel_path, ContentFile(buffer.getvalue()))
+        self.qr_image.name = saved_name
         self.save(update_fields=['qr_image', 'updated_at'])
 

@@ -57,3 +57,4 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(self.style.SUCCESS(f"Done! Generated QR codes for {count} table(s)."))
+
